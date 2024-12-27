@@ -21,13 +21,12 @@ cv2.createTrackbar("Threshold2", "Trackbars", 150, 255, nothing)
 def preprocess_image(img):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     blurred = cv2.GaussianBlur(gray, (5, 5), 0)
-
+    #weak and strong edge threshholds, gotten from parameter window
     threshold1 = cv2.getTrackbarPos("Threshold1", "Trackbars")
     threshold2 = cv2.getTrackbarPos("Threshold2", "Trackbars")
     
     imgCanny = cv2.Canny(blurred, threshold1, threshold2)
  
-    
     kernel = np.ones((5, 5), np.uint8)
     imgDil = cv2.dilate(imgCanny, kernel, iterations=1)
    
@@ -45,18 +44,12 @@ def preprocess_image(img):
         if len(approx) == 4:
             return approx  # Return the card contour
     
-    
     return None
-
-    #simpler way instead of approxPolyDP - just say "screw it is a rectangle"
-    #x, y, w, h = cv2.boundingRect(largest_contour)
-    #aspect_ratio = w / h
-    #if 0.5 < aspect_ratio < 2:  # Roughly rectangular
-    #cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
 def warp_card(img, contours):
     x, y, w, h = cv2.boundingRect(contours)
     #contours[i][j] where j is the contour and i is the point to be observed
+    #initially was 00 10 20 30 but was flipped on Y axis
     pts = np.float32([contours[1][0], contours[0][0], contours[3][0], contours[2][0]])
     target = np.float32([[0, 0], [w, 0], [w, h], [0, h]])
 
@@ -67,7 +60,7 @@ def extract_card(img):
     #convert to greyscale for easier reading
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     # PSM 6 is for single uniform blocks of text, rather then segmenting text
-    card_text = pytesseract.image_to_string(gray, config='--psm 6 --oem 3')  
+    card_text = pytesseract.image_to_string(gray, config='--psm 6')  
     return card_text
 
 def getPrice(img):
@@ -97,7 +90,7 @@ while True:
 
     if card_contour is not None:
         wrapped_card = warp_card(resized_image, card_contour)
-       
+        getPrice(wrapped_card)
         cv2.imshow("Warped Card", wrapped_card)
         cv2.drawContours(resized_image, [card_contour], -1, (0, 255, 0), 2)
 
