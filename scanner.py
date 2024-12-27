@@ -8,25 +8,33 @@ import pytesseract
 
 import re
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+# Create a window
+cv2.namedWindow("Trackbars")
+
+def nothing(x):
+    pass
+# Create two trackbars to control the Canny edge detection thresholds
+cv2.createTrackbar("Threshold1", "Trackbars", 50, 255, nothing)
+cv2.createTrackbar("Threshold2", "Trackbars", 150, 255, nothing)
+
 
 def preprocess_image(img):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     blurred = cv2.GaussianBlur(gray, (5, 5), 0)
-    #kernel = np.ones((5, 5), np.uint8)
-    #imgDil = cv2.dilate(blurred, kernel, iterations=1)
-    #sharpened = cv2.filter2D(imgDil, -1, kernel)
-    # Detect edges using Canny
-    #why 50 vs 150, poerhaps use parameters?
-    #threshold1 = cv2.getTrackbarPos("Threshold1", "Parameters")
-    #threshold2 = cv2.getTrackbarPos("Threshold2", "Parameters")
 
-    #uses gradient detection to try to identify edges on gradscale image
-    edges = cv2.Canny(blurred, 50, 150)
+    threshold1 = cv2.getTrackbarPos("Threshold1", "Trackbars")
+    threshold2 = cv2.getTrackbarPos("Threshold2", "Trackbars")
+    
+    imgCanny = cv2.Canny(blurred, threshold1, threshold2)
+ 
+    
+    kernel = np.ones((5, 5), np.uint8)
+    imgDil = cv2.dilate(imgCanny, kernel, iterations=1)
    
     #makes list of shapes in the image in a hierarchy  
     #cv2.RETR_EXTERNAL - outermost shapes
     #cv2.CHAIN_APPROX_SIMPLE - remove redundant straight lines
-    contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    contours, _ = cv2.findContours(imgDil, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     
     if contours:
         # Find the largest rectangular
@@ -49,7 +57,7 @@ def preprocess_image(img):
 def warp_card(img, contours):
     x, y, w, h = cv2.boundingRect(contours)
     #contours[i][j] where j is the contour and i is the point to be observed
-    pts = np.float32([contours[0][0], contours[1][0], contours[2][0], contours[3][0]])
+    pts = np.float32([contours[1][0], contours[0][0], contours[3][0], contours[2][0]])
     target = np.float32([[0, 0], [w, 0], [w, h], [0, h]])
 
     matrix = cv2.getPerspectiveTransform(pts, target)
@@ -81,7 +89,7 @@ while True:
     #if not success:
     #    break
     
-    img = cv2.imread("C:\\card.jpg")
+    img = cv2.imread("C:\card2.jpg")
     resized_image = cv2.resize(img, None, fx=0.3, fy=0.3)
     #get the large edges
     card_contour = preprocess_image(resized_image)
