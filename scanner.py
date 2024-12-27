@@ -60,8 +60,10 @@ def extract_card(img):
     #convert to greyscale for easier reading
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     # PSM 6 is for single uniform blocks of text, rather then segmenting text
-    card_text = pytesseract.image_to_string(gray, config='--psm 6')  
-    return card_text
+    card_text = pytesseract.image_to_string(gray, config='--psm 6 --oem 3')  
+    lines = card_text.splitlines()
+
+    return re.sub('[^a-zA-Z0-9,+ ]', '', lines[0])
 
 def getPrice(img):
     card_title = img[25:75, 34:400]
@@ -81,7 +83,8 @@ while True:
     #success, img = cap.read()
     #if not success:
     #    break
-    
+    time.sleep(1)
+
     img = cv2.imread("C:\card2.jpg")
     resized_image = cv2.resize(img, None, fx=0.3, fy=0.3)
     #get the large edges
@@ -90,7 +93,8 @@ while True:
 
     if card_contour is not None:
         wrapped_card = warp_card(resized_image, card_contour)
-        getPrice(wrapped_card)
+        card_data = extract_card(wrapped_card)
+        print(card_data)
         cv2.imshow("Warped Card", wrapped_card)
         cv2.drawContours(resized_image, [card_contour], -1, (0, 255, 0), 2)
 
@@ -101,3 +105,9 @@ while True:
 
 #cap.release()
 cv2.destroyAllWindows()
+
+
+#NEXT STEPS 
+#- fix reading of title: limit where tesseract reads
+#- cache image into database obj
+#- 
