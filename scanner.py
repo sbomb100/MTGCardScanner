@@ -7,6 +7,8 @@ import numpy as np
 import pytesseract
 
 import re
+
+
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 # Create a window
 cv2.namedWindow("Trackbars")
@@ -16,6 +18,7 @@ def nothing(x):
 # Create two trackbars to control the Canny edge detection thresholds
 cv2.createTrackbar("Threshold1", "Trackbars", 50, 255, nothing)
 cv2.createTrackbar("Threshold2", "Trackbars", 150, 255, nothing)
+
 
 
 def preprocess_image(img):
@@ -84,14 +87,24 @@ def warp_card(img, contours):
 
     return warped
 
+#get the title from the card
 def extract_card(img):
-    #convert to greyscale for easier reading
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    # PSM 6 is for single uniform blocks of text, rather then segmenting text
-    card_text = pytesseract.image_to_string(gray, config='--psm 6 --oem 3')  
-    lines = card_text.splitlines()
+    # Define the region of interest (adjust values based on your card layout)
+    roi_x, roi_y, roi_w, roi_h = 30, 25, 340, 75  # Example values, tune for your card
 
-    return re.sub('[^a-zA-Z0-9,+ ]', '', lines[0])
+    # Crop the ROI from the warped card image
+    card_name_roi = img[roi_y:roi_h, roi_x:roi_w]
+    
+    # Convert to grayscale for better OCR results
+    gray_roi = cv2.cvtColor(card_name_roi, cv2.COLOR_BGR2GRAY)
+
+    # Optional: Apply thresholding to enhance text visibility
+    _, thresh_roi = cv2.threshold(gray_roi, 128, 255, cv2.THRESH_BINARY)
+
+    # Perform OCR on the cropped ROI
+    card_name = re.sub('[^a-zA-Z0-9,+ ]', '', pytesseract.image_to_string(card_name_roi)).strip()
+    
+    return card_name
 
 def getPrice(img):
     card_title = img[25:75, 34:400]
@@ -111,19 +124,19 @@ while True:
     #success, img = cap.read()
     #if not success:
     #    break
-    time.sleep(1)
+    
 
-    img = cv2.imread("C:\card2.jpg")
-    resized_image = cv2.resize(img, None, fx=0.3, fy=0.3)
+    img = cv2.imread("C:\card3.jpg")
+    img = cv2.resize(img, None, fx=0.3, fy=0.3)
     #get the large edges
-    card_contour = preprocess_image(resized_image)
+    card_contour = preprocess_image(img)
         
 
     if card_contour is not None:
-        wrapped_card = warp_card(resized_image, card_contour)
+        wrapped_card = warp_card(img, card_contour)
         card_data = extract_card(wrapped_card)
         print(card_data)
-        #cv2.imshow("Original", resized_image)
+        #cv2.imshow("Camera Feed", img)
         #cv2.imshow("Contours", cv2.drawContours(resized_image.copy(), [card_contour], -1, (0, 255, 0), 2))
         cv2.imshow("Warped", wrapped_card)
         
