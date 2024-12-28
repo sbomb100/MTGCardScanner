@@ -46,15 +46,43 @@ def preprocess_image(img):
     
     return None
 
-def warp_card(img, contours):
-    x, y, w, h = cv2.boundingRect(contours)
-    #contours[i][j] where j is the contour and i is the point to be observed
-    #initially was 00 10 20 30 but was flipped on Y axis
-    pts = np.float32([contours[1][0], contours[0][0], contours[3][0], contours[2][0]])
-    target = np.float32([[0, 0], [w, 0], [w, h], [0, h]])
+#initial bug: points will show up in contour array out of order. order them
+def order_points(pts):
+    rect = np.zeros((4, 2), dtype="float32")
+    s = pts.sum(axis=1)
+    rect[0] = pts[np.argmin(s)]  # Top-left
+    rect[2] = pts[np.argmax(s)]  # Bottom-right
 
-    matrix = cv2.getPerspectiveTransform(pts, target)
-    return cv2.warpPerspective(img, matrix, (w, h))
+    diff = np.diff(pts, axis=1)
+    rect[1] = pts[np.argmin(diff)]  # Top-right
+    rect[3] = pts[np.argmax(diff)]  # Bottom-left
+
+    return rect
+
+def warp_card(img, contours):
+    # Reshape the contour to a 4x2 format
+    pts = contours.reshape(4, 2)
+
+    # make sure points are ordered
+    ordered_pts = order_points(pts)
+    (tl, tr, br, bl) = ordered_pts
+
+    # _ is the max length of the one side or the other (w= bottom vs top)
+    width = int(max(np.linalg.norm(br - bl), np.linalg.norm(tr - tl)))
+    height = int(max(np.linalg.norm(tr - br), np.linalg.norm(tl - bl)))
+
+    #the array of points that we want to warp to
+    target = np.array([
+        [0, 0],
+        [width - 1, 0],
+        [width - 1, height - 1],
+        [0, height - 1]
+    ], dtype="float32")
+
+    matrix = cv2.getPerspectiveTransform(ordered_pts, target)
+    warped = cv2.warpPerspective(img, matrix, (width, height))
+
+    return warped
 
 def extract_card(img):
     #convert to greyscale for easier reading
@@ -95,8 +123,10 @@ while True:
         wrapped_card = warp_card(resized_image, card_contour)
         card_data = extract_card(wrapped_card)
         print(card_data)
-        cv2.imshow("Warped Card", wrapped_card)
-        cv2.drawContours(resized_image, [card_contour], -1, (0, 255, 0), 2)
+        #cv2.imshow("Original", resized_image)
+        #cv2.imshow("Contours", cv2.drawContours(resized_image.copy(), [card_contour], -1, (0, 255, 0), 2))
+        cv2.imshow("Warped", wrapped_card)
+        
 
     
 
