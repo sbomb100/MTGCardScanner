@@ -164,15 +164,23 @@ def update_database(card_data):
                     card[4],
                     card[5],
                     card[6],
-                    0 
+                    1
                 ))
+
+                my_cursor.execute("""
+                INSERT INTO prices (card_id, usd, usd_foil)
+                VALUES (?, ?, ?)
+                """, (
+                    price[0],  # Use the 'id' to link to the card
+                    price[1],
+                    price[2]
+                ))
+
                 my_cards.commit()
         else:
             print(f"Card not found")
 
     
-
-
 
 #open camera
 #cap = cv2.VideoCapture(0)

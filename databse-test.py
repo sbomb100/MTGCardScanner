@@ -6,7 +6,7 @@ cursor = conn.cursor()
 
 card_name = "Psychic Whorl"
 # Check if "Static Orb" is in the 'cards' table
-cursor.execute("SELECT id, name, set_name FROM cards WHERE name = ?", (card_name,))
+cursor.execute("SELECT id, name, set_name, type, rarity, mana_cost, oracle_text, count FROM cards WHERE name = ?", (card_name,))
 card = cursor.fetchone()
 
 if card:
