@@ -221,12 +221,7 @@ while True:
 
 #cap.release()
 all_cards.close()
-
 my_cards.close()
 cv2.destroyAllWindows()
 
 
-#NEXT STEPS 
-#- fix reading of title: limit where tesseract reads
-#- cache image into database obj
-#- 
