@@ -1,10 +1,10 @@
 import sqlite3
 
 # Connect to SQLite database
-conn = sqlite3.connect("cards.db")
+conn = sqlite3.connect("MTGPersonalCollection.db")
 cursor = conn.cursor()
 
-card_name = input("Card Name:\n")
+card_name = "Psychic Whorl"
 # Check if "Static Orb" is in the 'cards' table
 cursor.execute("SELECT id, name, set_name FROM cards WHERE name = ?", (card_name,))
 card = cursor.fetchone()

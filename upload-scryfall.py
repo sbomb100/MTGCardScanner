@@ -2,7 +2,7 @@ import json
 import sqlite3
 
 # Load the JSON file
-with open("cards.json", "r", encoding="utf-8") as file:
+with open("../cards.json", "r", encoding="utf-8") as file:
     card_data = json.load(file)
 
 # Connect to SQLite database (or create it if it doesn't exist)
@@ -35,6 +35,7 @@ CREATE TABLE IF NOT EXISTS prices (
 # Insert data into tables
 for card in card_data:
     # Use the 'id' field from the JSON as the primary key for the card
+    
     cursor.execute("""
     INSERT INTO cards (id, name, set_name, type, rarity, mana_cost, oracle_text)
     VALUES (?, ?, ?, ?, ?, ?, ?)

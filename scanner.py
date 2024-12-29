@@ -1,5 +1,4 @@
 #used for images
-import time
 import cv2
 #used for matrix and perspective transformations
 import numpy as np
@@ -7,9 +6,13 @@ import numpy as np
 import pytesseract
 
 import re
-
+import sqlite3
 
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+
+
+
+
 # Create a window
 cv2.namedWindow("Trackbars")
 
@@ -19,7 +22,13 @@ def nothing(x):
 cv2.createTrackbar("Threshold1", "Trackbars", 50, 255, nothing)
 cv2.createTrackbar("Threshold2", "Trackbars", 150, 255, nothing)
 
+all_cards = sqlite3.connect("cards.db")
+my_cards = sqlite3.connect("MTGPersonalCollection.db")
 
+all_cursor = all_cards.cursor()
+my_cursor = my_cards.cursor()
+
+last_card = ()
 
 def preprocess_image(img):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -106,15 +115,64 @@ def extract_card(img):
     
     return card_name
 
-def getPrice(img):
-    card_title = img[25:75, 34:400]
-    # cv2.imshow("Card Name",card_title)
 
-    card_name = re.sub('[^a-zA-Z0-9,+ ]', '', pytesseract.image_to_string(card_title))
+#check the scryfall databse for the card via name
+def update_database(card_data):
+    
+    all_cursor.execute("""SELECT id, name, set_name, type, rarity, mana_cost, oracle_text
+                    FROM cards WHERE name = ?""", (card_data,))
+    card = all_cursor.fetchone()
+    if card:
 
-    print("Card name: ", card_name)
+        print(f"Found card: {card}")
+        #fetch the price
+        all_cursor.execute("""
+        SELECT card_id, usd, usd_foil
+        FROM prices
+        WHERE card_id = (SELECT id FROM cards WHERE name = ?)
+        """, (card_data,))
+
+        price = all_cursor.fetchone()
+
+        if price:
+            print(f"Prices for '{card_data}': {price}")
+            
+            my_cursor.execute("SELECT count FROM cards WHERE id = ?", (card[0],))
+            existing_card = my_cursor.fetchone()
+            #fetch the price
+            if (existing_card):
+                new_count = existing_card[0] + card.get("count", 0)  # Add the new count to the existing one
+                print(f"more cards, now at: {existing_card}!")
+                my_cursor.execute("""
+                UPDATE cards
+                SET count = ?
+                WHERE id = ?
+                """, (new_count, card[0]))
+                my_cards.commit()
+            else:
+                # If the card does not exist, insert a new card with count
+                print("new card!")
+                print(card)
+                my_cursor.execute("""
+                INSERT INTO cards (id, name, set_name, type, rarity, mana_cost, oracle_text, count)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """, (
+                    card[0],
+                    card[1],
+                    card[2],
+                    card[3],
+                    card[4],
+                    card[5],
+                    card[6],
+                    0 
+                ))
+                my_cards.commit()
+        else:
+            print(f"Card not found")
 
     
+
+
 
 #open camera
 #cap = cv2.VideoCapture(0)
@@ -124,9 +182,8 @@ while True:
     #success, img = cap.read()
     #if not success:
     #    break
-    
 
-    img = cv2.imread("C:\card3.jpg")
+    img = cv2.imread("C:\card2.jpg")
     img = cv2.resize(img, None, fx=0.3, fy=0.3)
     #get the large edges
     card_contour = preprocess_image(img)
@@ -135,18 +192,29 @@ while True:
     if card_contour is not None:
         wrapped_card = warp_card(img, card_contour)
         card_data = extract_card(wrapped_card)
-        print(card_data)
+        #print(card_data)
         #cv2.imshow("Camera Feed", img)
         #cv2.imshow("Contours", cv2.drawContours(resized_image.copy(), [card_contour], -1, (0, 255, 0), 2))
-        cv2.imshow("Warped", wrapped_card)
-        
 
+        cv2.imshow("Warped", wrapped_card)
+        if (card_data == last_card):
+            break
+            continue
+        else: 
+            #now that we have the name, check databse
+            last_card = card_data
+            ret = update_database(card_data)
+       
+        
     
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
 #cap.release()
+all_cards.close()
+
+my_cards.close()
 cv2.destroyAllWindows()
 
 
