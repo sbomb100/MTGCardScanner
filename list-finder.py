@@ -2,6 +2,12 @@ import sqlite3
 import os
 import sys
 
+#how expensive does a card have to be to warrant a proxy
+#somewher ebetween 1 - 2 USD
+PROXY_LIMIT = 1.25
+
+#CONSIDER changing output in file to be easier to paste into proxy websites
+
 method = (input("Command-Line (cl) or Text File (txt)?\n")).lower()
 connection = sqlite3.connect("MTGPersonalCollection.db")
 cursor = connection.cursor()
@@ -31,11 +37,39 @@ out_filename = "filler"
 owned_cards = []
 cheap_needed_cards = []
 proxy_needed_cards = []
+unable_to_buy = []
+
+def sort_cards(line, name):
+            cursor.execute("SELECT id, name, count FROM cards WHERE name = ?", (name,))
+            result = cursor.fetchone()
+            if result != None:
+                owned_cards.append(result)
+            else: #check scryfall
+                cards_cursor.execute("""
+                SELECT card_id, usd, usd_foil
+                FROM prices
+                WHERE card_id = (SELECT id FROM cards WHERE name = ?)
+                """, (name,))
+                queried_card = cards_cursor.fetchone()
+                if queried_card != None:
+                    if (queried_card == None):
+                        print("err- no price")
+                        return
+                    #no price
+                    if (queried_card[1] == None and queried_card[2] == None):
+                        unable_to_buy.append(line)
+                    else:
+                        if  round(float(queried_card[(1 if queried_card[1] != None else 2)]), 2) < PROXY_LIMIT:
+                            cheap_needed_cards.append(line)
+                        else:
+                            proxy_needed_cards.append(line)
+                else:
+                    print("error- card not found on scryfall")
 
 if (method == "txt" or method == "text"):
-    print("Reading Text File\n")
+    print("\nReading Text File -----")
     filename = ensure_txt_extension(input("Type Text File Name\n")) 
-    print("-----------------------------\n")   
+    print("---------------\n")   
     with open(filename, 'r') as file:
         #get commander name:
         commander_name = file.readline().split(" (")[0]
@@ -47,26 +81,12 @@ if (method == "txt" or method == "text"):
         #write whole deck into 2 lists of owned and unowned for better writing into file
         file.seek(0)
         for line in file:
-            cursor.execute("SELECT id, name, count FROM cards WHERE name = ?", (line.split(" (")[0],))
-            result = cursor.fetchone()
-            if result:
-                owned_cards.append(result)
-            else:
-                cards_cursor.execute("SELECT id FROM cards WHERE name = ?", (line.split(" (")[0],))
-                queried_card = cards_cursor.fetchone()
-                print(queried_card)
-                if queried_card:
-                    cards_cursor.execute("SELECT card_id, usd, usd_foil FROM prices WHERE card_id = ?", (queried_card[0],))
-                    price_card = cards_cursor.fetchone()
-                    print(price_card)
-                    #cheap_needed_cards.append(result) if  round(float(price_card[1]), 2) < 1.25 else proxy_needed_cards.append(result)
-                else:
-                    print("error")
+            sort_cards(line, line.split(" (")[0])
                 
 
 #read through command line
 elif (method == "cl" or method == "commandline" or method == "command-line"):
-    print("Paste List:\n")
+    print("\nPaste List:")
     list = sys.stdin.read()
     lines = list.strip().split("\n")
     print("-----------------------------\n")
@@ -82,17 +102,23 @@ else:
     print("invalid input")
 
 #write to file
+#TODO: FIX OUTPUT WHERE LAST LINE DOES NOT HAVE A /n
 with open(out_filename, 'w') as outfile:
     outfile.write("OWNED CARDS -----------------\n")
     for item in owned_cards:
-        outfile.write(f"You have {item[1]} of {item[0]}\n")
+        outfile.write(f"You have {item[2]} of {item[1]}\n")
     
-    outfile.write("CHEAP UNOWNED CARDS -----------------\n")
+    outfile.write("\nCHEAP UNOWNED CARDS -----------------\n")
     for item in cheap_needed_cards:
-        outfile.write(f"{item[0]}\n")
+        outfile.write(f"{item}")
 
-    outfile.write("PROXY UNOWNED CARDS -----------------\n")
+    outfile.write("\nPROXY UNOWNED CARDS -----------------\n")
     for item in proxy_needed_cards:
-        outfile.write(f"{item[0]}\n")
+        outfile.write(f"{item}")
+
+    outfile.write("\n")
+    outfile.write("UNPRICED CARDS -----------------\n")
+    for item in unable_to_buy:
+        outfile.write(f"{item}")
 
 print("-- DONE -- \n")
