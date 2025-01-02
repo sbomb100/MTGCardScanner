@@ -8,7 +8,7 @@ Instruction:
 - For future implementations, as of right now, the plan is to expect users to not attempt to track the same card 2 times in a row.
     for new database updates, show different cards or restart the scanner to add additional cards.
 
-- Run list finder witha given text document to get the info for it
+- Run list finder with a given text document to get the info for it
 - run scanner to scan cards
 - run the database files for creation.
 
@@ -23,9 +23,10 @@ Possible add-ons:
 #  > change single image to camera feed
 #  > make continual reads of the same card not multiple upload
 #  >
-#- make it able to search the personal databse given a moxfield deck list
-#  > sqlquery loop for each card, print out cards i owned
-#  > proxy vs lgs: for cards I dont have, sort into <$1 >$1 to determine wether to proxy the rest
+#- combine the camera and deck query features to make it easier to go between them.
+#  > GUI? some kind of user interaction for easier use
+#  > adjust the text docuement to be a shown display as well, allow choice of text doc, edit prompts to be easier to not mess up
+#
 #- perhaps shift into website or app to make it easier to use
 #  > i dont know ios development
 #  > i do not have an android
