@@ -203,7 +203,7 @@ while True:
         #print(card_data)
         #cv2.imshow("Camera Feed", img)
         #cv2.imshow("Contours", cv2.drawContours(resized_image.copy(), [card_contour], -1, (0, 255, 0), 2))
-
+        #card_data = "The Beamtown Bullies"
         cv2.imshow("Warped", wrapped_card)
         if (card_data == last_card):
             break
