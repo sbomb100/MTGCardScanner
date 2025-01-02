@@ -1,0 +1,101 @@
+OWNED CARDS -----------------
+
+CHEAP UNOWNED CARDS -----------------
+Flubs, the Fool (BLC) 356
+Goblin Anarchomancer (MH2) 421
+Illithid Harvester // Plant Tadpoles (CLB) 76
+Impending Flux (WHO) 87
+Loyal Inventor (ACR) 21
+Memory Worm (WHO) 90
+Molten Gatekeeper (MH3) 128
+Party Thrasher (MH3) 129
+Trickster's Elk (MH3) 175
+Wild Wasteland (PIP) 71
+Augur of Autumn (MID) 168
+Cemetery Illuminator (VOW) 50
+Cephalid Coliseum (MH3) 300
+Command Tower (OTC) 280
+Devilish Valet (SNC) 105
+Doc Aurlock, Grizzled Genius (OTJ) 201
+Eruth, Tormented Prophet (VOW) 237
+Inti, Seneschal of the Sun (LCI) 295
+Laelia, the Blade Reforged (MH3) 281
+Sakura-Tribe Elder (MKC) 183
+Shivan Reef (M3C) 375
+Somberwald Sage (MIC) 144
+Song of Creation (IKO) 210
+Squee, the Immortal (DOM) 146
+Tlincalli Hunter // Retrieve Prey (CLB) 682
+Yavimaya Coast (M3C) 410
+
+PROXY UNOWNED CARDS -----------------
+Commercial District (PMKM) 259p
+Hedge Maze (PMKM) 262p
+Keeper of Secrets (40K) 78
+Nissa, Resurgent Animist (MAT) 22
+Phantasmal Image (M12) 72
+Animar, Soul of Elements (2X2) 171
+Ashaya, Soul of the Wild (PZNR) 179p
+Avenger of Zendikar (M3C) 221
+Azusa, Lost but Seeking (A25) 161
+Bala Ged Recovery // Bala Ged Sanctuary (ZNR) 180
+Barkchannel Pathway // Tidechannel Pathway (KHM) 251
+Beast Within (LCC) 233
+Birds of Paradise (RVR) 344
+Birgi, God of Storytelling // Harnfel, Horn of Bounty (KHM) 311
+Bloom Tender (PLST) EVE-66
+Boseiju, Who Endures (NEO) 266
+Breeding Pool (GTC) 240
+Cragcrown Pathway // Timbercrown Pathway (ZNR) 287
+Crucible of Worlds (10E) 319
+Cyclonic Rift (C14) 104
+Delayed Blast Fireball (CLB) 630
+Delighted Halfling (LTR) 363
+Dreamroot Cascade (M3C) 338
+Dryad of the Ilysian Grove (M3C) 225
+Eladamri, Korvecdal (MH3) 149
+Ensnaring Bridge (8ED) 300
+Etali, Primal Conqueror // Etali, Primal Sickness (MOM) 298
+Fabled Passage (PW21) 4 F
+Faldorn, Dread Wolf Herald (CLB) 932 E
+Fauna Shaman (PBRO) 179p
+Flaming Tyrannosaurus (WHO) 85
+Food Chain (PLST) MMQ-246
+Glasspool Mimic // Glasspool Shore (ZNR) 60
+Karplusan Forest (DKM) 39
+Ketria Triome (IKO) 250
+Lotus Cobra (ZNR) 307
+Misty Rainforest (MM3) 240
+Oracle of Mul Daya (ZEN) 172
+Passionate Archaeologist (CLB) 656 F
+Pongify (M3C) 190
+Questing Druid // Seek the Beast (WOE) 294
+Ramunap Excavator (M3C) 241
+Rapid Hybridization (LCC) 166
+Riverglide Pathway // Lavaglide Pathway (ZNR) 289
+Rockfall Vale (MID) 266
+Scalding Tarn (MM3) 244
+Scute Swarm (OTC) 205
+Sensei's Divining Top (EMA) 232
+Shifting Woodland (MH3) 228
+Sol Ring (MKC) 237
+Steam Vents (RTR) 247
+Stomping Ground (GTC) 247
+Stormcarved Coast (WHO) 308
+Sylvan Library (DMR) 350
+Terror of the Peaks (POTJ) 149p
+Thundering Falls (PMKM) 269p
+Tireless Provisioner (H2R) 15
+Uba Mask (CHK) 272
+Urza's Saga (MH2) 259
+Wayward Swordtooth (LCC) 263
+Wooded Foothills (MH3) 236
+Worldly Tutor (DMR) 353
+Yavimaya, Cradle of Growth (M3C) 409
+
+UNPRICED CARDS -----------------
+Agate Instigator (BLC) 56
+Forest (MKM) 286
+Island (MH3) 312
+Mountain (WOE) 273
+Gustha's Scepter (ALL) 120

@@ -69,7 +69,7 @@ def sort_cards(line, name):
 if (method == "txt" or method == "text"):
     print("\nReading Text File -----")
     filename = ensure_txt_extension(input("Type Text File Name\n")) 
-    print("---------------\n")   
+
     with open(filename, 'r') as file:
         #get commander name:
         commander_name = file.readline().split(" (")[0]
@@ -89,20 +89,20 @@ elif (method == "cl" or method == "commandline" or method == "command-line"):
     print("\nPaste List:")
     list = sys.stdin.read()
     lines = list.strip().split("\n")
-    print("-----------------------------\n")
+    commander_name = lines[0].split(" (")[0]
+    if (commander_name == ""):
+        out_filename = get_unique_filename()
+    else:
+        out_filename = f"{commander_name.replace(" ", "_").lower()}.txt"
+
     for line in lines:
-        cursor.execute("SELECT 1 FROM cards WHERE name = ?", (line.split(" (")[0],))
-        result = cursor.fetchone()
-        if result:
-            print(f"{line.split(" (")[0]} exists in the database!")
-        else:
-            print(f"{line.split(" (")[0]} does NOT exist in the database!")
+        print(line.split(" (")[0])
+        sort_cards(line, line.split(" (")[0])
 
 else: 
     print("invalid input")
 
 #write to file
-#TODO: FIX OUTPUT WHERE LAST LINE DOES NOT HAVE A /n
 with open(out_filename, 'w') as outfile:
     outfile.write("OWNED CARDS -----------------\n")
     for item in owned_cards:
@@ -111,14 +111,24 @@ with open(out_filename, 'w') as outfile:
     outfile.write("\nCHEAP UNOWNED CARDS -----------------\n")
     for item in cheap_needed_cards:
         outfile.write(f"{item}")
+        if not item.endswith("\n"):
+            outfile.write("\n")
 
     outfile.write("\nPROXY UNOWNED CARDS -----------------\n")
     for item in proxy_needed_cards:
         outfile.write(f"{item}")
+        if not item.endswith("\n"):
+            outfile.write("\n")
 
-    outfile.write("\n")
-    outfile.write("UNPRICED CARDS -----------------\n")
+    outfile.write("\nUNPRICED CARDS -----------------\n")
     for item in unable_to_buy:
         outfile.write(f"{item}")
+        if not item.endswith("\n"):
+            outfile.write("\n")
+
+
+
+connection.close()
+db.close()
 
 print("-- DONE -- \n")
