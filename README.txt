@@ -3,6 +3,14 @@ This is a project to
 2) look these cards up in a MTG Database to get all information (Done!)
 3) store these in a personal databse for fast query search in case of deck building (Done!)
 
+Instruction:
+- Currently, give the image of the card to the scanner (a light solid color background is best)
+- For future implementations, as of right now, the plan is to expect users to not attempt to track the same card 2 times in a row.
+    for new database updates, show different cards or restart the scanner to add additional cards.
+
+- Run list finder witha given text document to get the info for it
+- run scanner to scan cards
+- run the database files for creation.
 
 Possible add-ons:
 - name search

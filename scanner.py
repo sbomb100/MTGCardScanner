@@ -191,7 +191,7 @@ while True:
     #if not success:
     #    break
 
-    img = cv2.imread("C:\card2.jpg")
+    img = cv2.imread("../card-pics/treecity.jpg")
     img = cv2.resize(img, None, fx=0.3, fy=0.3)
     #get the large edges
     card_contour = preprocess_image(img)
@@ -213,9 +213,6 @@ while True:
             last_card = card_data
             ret = update_database(card_data)
        
-        
-    
-
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
