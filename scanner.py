@@ -10,8 +10,8 @@ import sqlite3
 
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
-
-
+CAMERA_TO_USE = 1
+last_card = ""
 
 # Create a window
 cv2.namedWindow("Trackbars")
@@ -28,7 +28,7 @@ my_cards = sqlite3.connect("MTGPersonalCollection.db")
 all_cursor = all_cards.cursor()
 my_cursor = my_cards.cursor()
 
-last_card = ()
+
 
 def preprocess_image(img):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -98,32 +98,47 @@ def warp_card(img, contours):
 
 #get the title from the card
 def extract_card(img):
-    # Define the region of interest (adjust values based on your card layout)
-    roi_x, roi_y, roi_w, roi_h = 30, 25, 340, 75  # Example values, tune for your card
+    
+    # Ensure the card is in portrait orientation
+    height, width = img.shape[:2]
+    if width > height:  # Landscape orientation
+        img = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
+
+    # Dynamically calculate ROI based on card dimensions
+    roi_x = int(0.07 * img.shape[1])  # 8% from the left
+    roi_y = int(0.05 * img.shape[0])  # 5% from the top
+    roi_w = int(0.60 * img.shape[1])  # 85% width
+    roi_h = int(0.06 * img.shape[0])  # 15% height
 
     # Crop the ROI from the warped card image
-    card_name_roi = img[roi_y:roi_h, roi_x:roi_w]
-    
+    card_name_roi = img[roi_y:roi_y + roi_h, roi_x:roi_x + roi_w]
+    cv2.imshow("name", card_name_roi)
     # Convert to grayscale for better OCR results
     gray_roi = cv2.cvtColor(card_name_roi, cv2.COLOR_BGR2GRAY)
-
+    
     # Optional: Apply thresholding to enhance text visibility
     _, thresh_roi = cv2.threshold(gray_roi, 128, 255, cv2.THRESH_BINARY)
+    cv2.imshow("Processed ROI", thresh_roi)
 
+    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+    contrast_enhanced = clahe.apply(thresh_roi)
+    cv2.imshow("Contrast Enhanced", contrast_enhanced)
     # Perform OCR on the cropped ROI
-    card_name = re.sub('[^a-zA-Z0-9,+ ]', '', pytesseract.image_to_string(card_name_roi)).strip()
-    
+    card_name = re.sub('[^a-zA-Z0-9,+ ]', '', pytesseract.image_to_string(thresh_roi)).strip()
+    print(card_name)
     return card_name
+
 
 
 #check the scryfall databse for the card via name
 def update_database(card_data):
+    global last_card
     
     all_cursor.execute("""SELECT id, name, set_name, type, rarity, mana_cost, oracle_text
                     FROM cards WHERE name = ?""", (card_data,))
     card = all_cursor.fetchone()
     if card:
-
+        last_card = card_data.strip()
         print(f"Found card: {card}")
         #fetch the price
         all_cursor.execute("""
@@ -141,8 +156,8 @@ def update_database(card_data):
             existing_card = my_cursor.fetchone()
             #fetch the price
             if (existing_card):
-                new_count = existing_card[0] + card.get("count", 0)  # Add the new count to the existing one
-                print(f"more cards, now at: {existing_card}!")
+                new_count = existing_card[0] + 1  # Add the new count to the existing one
+                print(f"more cards, now at: {existing_card} of {card_data}!")
                 my_cursor.execute("""
                 UPDATE cards
                 SET count = ?
@@ -175,7 +190,7 @@ def update_database(card_data):
                     price[1],
                     price[2]
                 ))
-
+                print("Card Added --")
                 my_cards.commit()
         else:
             print(f"Card not found")
@@ -183,37 +198,46 @@ def update_database(card_data):
     
 
 #open camera
-#cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(CAMERA_TO_USE)
+frame_count = 0
+process_every_n_frames = 30
 
 while True:
     #frame capture
-    #success, img = cap.read()
-    #if not success:
-    #    break
-
-    img = cv2.imread("../card-pics/treecity.jpg")
-    img = cv2.resize(img, None, fx=0.3, fy=0.3)
+    success, img = cap.read()
+    cv2.imshow("Camera Feed", img)
+    if not success:
+        print("ERROR: Cam Broke")
+        break
+    #img = cv2.imread("../card-pics/treecity.jpg")
+    #img = cv2.resize(img, None, fx=0.3, fy=0.3)
     #get the large edges
     card_contour = preprocess_image(img)
         
-
-    if card_contour is not None:
+    frame_count += 1
+    if card_contour is not None and frame_count % process_every_n_frames == 0:
         wrapped_card = warp_card(img, card_contour)
         card_data = extract_card(wrapped_card)
-        #print(card_data)
-        #cv2.imshow("Camera Feed", img)
+        
+        
         #cv2.imshow("Contours", cv2.drawContours(resized_image.copy(), [card_contour], -1, (0, 255, 0), 2))
         #card_data = "The Beamtown Bullies"
         cv2.imshow("Warped", wrapped_card)
-        if (card_data == last_card):
-            break
+        print(f"{card_data} is {last_card} \n")
+        if card_data.strip() == "":
+            print("DEBUG: Card data is empty, skipping frame.")
+            continue
+
+        if card_data.strip() == last_card:
+            print("DEBUG: Duplicate card detected, skipping database update.")
             continue
         else: 
             #now that we have the name, check databse
-            last_card = card_data
+            
             ret = update_database(card_data)
        
     if cv2.waitKey(1) & 0xFF == ord('q'):
+        print("Quitting")
         break
 
 #cap.release()
@@ -222,3 +246,6 @@ my_cards.close()
 cv2.destroyAllWindows()
 
 
+#TODO:
+#make so any orientation will get flipped upright.
+#
