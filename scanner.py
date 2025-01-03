@@ -125,7 +125,7 @@ def extract_card(img):
     cv2.imshow("Contrast Enhanced", contrast_enhanced)
     # Perform OCR on the cropped ROI
     card_name = re.sub('[^a-zA-Z0-9,+ ]', '', pytesseract.image_to_string(thresh_roi)).strip()
-    print(card_name)
+    
     return card_name
 
 
