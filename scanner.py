@@ -133,7 +133,7 @@ def extract_card(img):
 #check the scryfall databse for the card via name
 def update_database(card_data):
     global last_card
-    
+
     all_cursor.execute("""SELECT id, name, set_name, type, rarity, mana_cost, oracle_text
                     FROM cards WHERE name = ?""", (card_data,))
     card = all_cursor.fetchone()
@@ -248,4 +248,5 @@ cv2.destroyAllWindows()
 
 #TODO:
 #make so any orientation will get flipped upright.
+#double check the card reading so that you do not accidentally get a card that is partially in the name of another card (rare bug)
 #
