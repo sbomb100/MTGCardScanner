@@ -166,8 +166,7 @@ def update_database(card_data):
                 my_cards.commit()
             else:
                 # If the card does not exist, insert a new card with count
-                print("new card!")
-                print(card)
+                print("new card!\n")
                 my_cursor.execute("""
                 INSERT INTO cards (id, name, set_name, type, rarity, mana_cost, oracle_text, count)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
@@ -190,7 +189,7 @@ def update_database(card_data):
                     price[1],
                     price[2]
                 ))
-                print("Card Added --")
+                print(f"Card Added -- {card[1]}")
                 my_cards.commit()
         else:
             print(f"Card not found")
@@ -207,7 +206,7 @@ while True:
     success, img = cap.read()
     cv2.imshow("Camera Feed", img)
     if not success:
-        print("ERROR: Cam Broke")
+        print("ERROR: Camera Broke")
         break
     #img = cv2.imread("../card-pics/treecity.jpg")
     #img = cv2.resize(img, None, fx=0.3, fy=0.3)
@@ -223,9 +222,9 @@ while True:
         #cv2.imshow("Contours", cv2.drawContours(resized_image.copy(), [card_contour], -1, (0, 255, 0), 2))
         #card_data = "The Beamtown Bullies"
         cv2.imshow("Warped", wrapped_card)
-        print(f"{card_data} is {last_card} \n")
+        #print(f"{card_data} is {last_card} \n")
         if card_data.strip() == "":
-            print("DEBUG: Card data is empty, skipping frame.")
+            #print("DEBUG: Card data is empty, skipping frame.")
             continue
 
         if card_data.strip() == last_card:
