@@ -22,8 +22,8 @@ def nothing(x):
 cv2.createTrackbar("Threshold1", "Trackbars", 50, 255, nothing)
 cv2.createTrackbar("Threshold2", "Trackbars", 150, 255, nothing)
 
-all_cards = sqlite3.connect("./databases/cards.db")
-my_cards = sqlite3.connect("./databases/MTGPersonalCollection.db")
+all_cards = sqlite3.connect("databases/cards.db")
+my_cards = sqlite3.connect("databases/MTGPersonalCollection.db")
 
 all_cursor = all_cards.cursor()
 my_cursor = my_cards.cursor()
@@ -170,13 +170,7 @@ def update_database(card_data):
                 INSERT INTO cards (id, name, set_name, type, rarity, mana_cost, oracle_text, count)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """, (
-                    card[0],
-                    card[1],
-                    card[2],
-                    card[3],
-                    card[4],
-                    card[5],
-                    card[6],
+                    *card[:7],
                     1
                 ))
 
@@ -184,9 +178,7 @@ def update_database(card_data):
                 INSERT INTO prices (card_id, usd, usd_foil)
                 VALUES (?, ?, ?)
                 """, (
-                    price[0],  # Use the 'id' to link to the card
-                    price[1],
-                    price[2]
+                    price[:3]
                 ))
                 print(f"Card Added -- {card[1]}")
                 my_cards.commit()
@@ -207,8 +199,6 @@ while True:
     if not success:
         print("ERROR: Camera Broke")
         break
-    #img = cv2.imread("../card-pics/treecity.jpg")
-    #img = cv2.resize(img, None, fx=0.3, fy=0.3)
     #get the large edges
     card_contour = preprocess_image(img)
         
@@ -217,9 +207,7 @@ while True:
         wrapped_card = warp_card(img, card_contour)
         card_data = extract_card(wrapped_card)
         
-        
-        #cv2.imshow("Contours", cv2.drawContours(resized_image.copy(), [card_contour], -1, (0, 255, 0), 2))
-        #card_data = "The Beamtown Bullies"
+       
         cv2.imshow("Warped", wrapped_card)
         #print(f"{card_data} is {last_card} \n")
         if card_data.strip() == "":
