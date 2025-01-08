@@ -69,14 +69,42 @@ class MagicGUI(QWidget):
         stylesheet = self.load_css(f"{os.path.dirname(__file__)}/css/home.css")
         app.setStyleSheet(stylesheet)
 
-
+    #Making the About Popup Window
     def about_popup(self):
         PopupWindow.show_popup(self)
 
+    def delete_old_layout(self):
+        #delete old layout
+        QWidget().setLayout(self.layout())
+        layout = QGridLayout(self)
+        QObjectCleanupHandler().add(self.layout())
+
+    #Changing the layout to the scanner page
     def draw_scannerpage(self):
+        
+        self.delete_old_layout()
         scanner_window = QHBoxLayout()
+       
+        #Camera Side Vertical Box ----
+        camera_box = QVBoxLayout()
+
+        #Last Card Scanned Vertical Box
+        last_scanned_box = QVBoxLayout()
+
+        scanner_window.addLayout(camera_box)
+        scanner_window.addLayout(last_scanned_box)
+        self.setLayout(scanner_window)
+    
+    #Changing the layout to the deck page
     def draw_deckpage(self):
+        self.delete_old_layout()
         deck_window = QHBoxLayout()
+
+        #Left Side Vertical Box
+
+        #Right Side Vertical Box
+
+        self.setLayout(deck_window)
 
 #mini class for the About Popup Window
 class PopupWindow(QWidget):
