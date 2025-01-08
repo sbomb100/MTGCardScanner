@@ -107,24 +107,23 @@ def extract_card(img):
     # Dynamically calculate ROI based on card dimensions
     roi_x = int(0.07 * img.shape[1])  # 8% from the left
     roi_y = int(0.05 * img.shape[0])  # 5% from the top
-    roi_w = int(0.60 * img.shape[1])  # 85% width
+    roi_w = int(0.75 * img.shape[1])  # 85% width TODO EDIT TO FIT LONGER CARDS
     roi_h = int(0.06 * img.shape[0])  # 15% height
 
     # Crop the ROI from the warped card image
     card_name_roi = img[roi_y:roi_y + roi_h, roi_x:roi_x + roi_w]
     cv2.imshow("name", card_name_roi)
     # Convert to grayscale for better OCR results
-    gray_roi = cv2.cvtColor(card_name_roi, cv2.COLOR_BGR2GRAY)
+    gray = cv2.cvtColor(card_name_roi, cv2.COLOR_BGR2GRAY)
+    # Apply thresholding
+    _, binary = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    # Denoise
     
-    # Optional: Apply thresholding to enhance text visibility
-    _, thresh_roi = cv2.threshold(gray_roi, 128, 255, cv2.THRESH_BINARY)
-    cv2.imshow("Processed ROI", thresh_roi)
-
-    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
-    contrast_enhanced = clahe.apply(thresh_roi)
-    cv2.imshow("Contrast Enhanced", contrast_enhanced)
+   
+    cv2.imshow("name", binary)
     # Perform OCR on the cropped ROI
-    card_name = re.sub('[^a-zA-Z0-9,+ ]', '', pytesseract.image_to_string(thresh_roi)).strip()
+    card_name = re.sub('[^a-zA-Z,+\', ]', '', pytesseract.image_to_string(binary)).strip()
+
     
     return card_name
 
@@ -157,7 +156,7 @@ def update_database(card_data):
             #fetch the price
             if (existing_card):
                 new_count = existing_card[0] + 1  # Add the new count to the existing one
-                print(f"more cards, now at: {existing_card} of {card_data}!")
+                print(f"more cards, now at: {new_count} of {card_data}!")
                 my_cursor.execute("""
                 UPDATE cards
                 SET count = ?
@@ -228,7 +227,7 @@ while True:
             continue
 
         if card_data.strip() == last_card:
-            print("DEBUG: Duplicate card detected, skipping database update.")
+            #print("DEBUG: Duplicate card detected, skipping database update.")
             continue
         else: 
             #now that we have the name, check databse
@@ -248,4 +247,5 @@ cv2.destroyAllWindows()
 #TODO:
 #make so any orientation will get flipped upright.
 #double check the card reading so that you do not accidentally get a card that is partially in the name of another card (rare bug)
-#
+# may want to edit so that the name section will narrow or broaden based on abilityto capture mana or not full name
+# flip card if cant read anything
