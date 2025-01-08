@@ -18,11 +18,8 @@ Possible add-ons:
 
 
 #NEXT STEPS 
-#- change from single image to image stream
-#  > get camera to focus
-#  > change single image to camera feed
-#  > make continual reads of the same card not multiple upload
-#  >
+#- Possibly multithread image processing for card titles to make it so it can read a card thats upside down or right side up
+
 #- combine the camera and deck query features to make it easier to go between them.
 #  > GUI? some kind of user interaction for easier use
 #  > adjust the text docuement to be a shown display as well, allow choice of text doc, edit prompts to be easier to not mess up
