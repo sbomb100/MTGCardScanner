@@ -1,7 +1,7 @@
 import sqlite3
 
 # Connect to SQLite database
-conn = sqlite3.connect("cards.db")
+conn = sqlite3.connect("../databases/cards.db")
 cursor = conn.cursor()
 
 card_name = "Tibalt's Trickery"

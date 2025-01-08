@@ -22,8 +22,8 @@ def nothing(x):
 cv2.createTrackbar("Threshold1", "Trackbars", 50, 255, nothing)
 cv2.createTrackbar("Threshold2", "Trackbars", 150, 255, nothing)
 
-all_cards = sqlite3.connect("cards.db")
-my_cards = sqlite3.connect("MTGPersonalCollection.db")
+all_cards = sqlite3.connect("./databases/cards.db")
+my_cards = sqlite3.connect("./databases/MTGPersonalCollection.db")
 
 all_cursor = all_cards.cursor()
 my_cursor = my_cards.cursor()

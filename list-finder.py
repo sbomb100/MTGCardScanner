@@ -9,9 +9,9 @@ PROXY_LIMIT = 1.25
 #CONSIDER changing output in file to be easier to paste into proxy websites
 
 method = (input("Command-Line (cl) or Text File (txt)?\n")).lower()
-connection = sqlite3.connect("MTGPersonalCollection.db")
+connection = sqlite3.connect("./databases/MTGPersonalCollection.db")
 cursor = connection.cursor()
-db = sqlite3.connect("cards.db")
+db = sqlite3.connect("./databases/cards.db")
 cards_cursor = db.cursor()
 
 def get_unique_filename():

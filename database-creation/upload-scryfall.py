@@ -2,11 +2,11 @@ import json
 import sqlite3
 
 # Load the JSON file
-with open("../cards.json", "r", encoding="utf-8") as file:
+with open("../../cards.json", "r", encoding="utf-8") as file:
     card_data = json.load(file)
 
 # Connect to SQLite database (or create it if it doesn't exist)
-conn = sqlite3.connect("cards.db")
+conn = sqlite3.connect("../databases/cards.db")
 cursor = conn.cursor()
 
 # Create tables
