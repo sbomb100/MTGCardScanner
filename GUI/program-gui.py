@@ -2,8 +2,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 import sys
-
-
+import os
 
 class MagicGUI(QWidget):
     
@@ -57,7 +56,6 @@ class MagicGUI(QWidget):
         about_button = QPushButton("About")
         about_button.setObjectName("about_button")
         about_button.clicked.connect(self.about_popup)
-        #self.button.clicked.connect(self.on_button_click)
         main_window.addWidget(about_button, alignment=Qt.AlignRight)
 
         #setting cursors
@@ -68,23 +66,44 @@ class MagicGUI(QWidget):
         self.setLayout(main_window)
 
         #Load Homepage CSS
-        stylesheet = self.load_css("./css/home.css")
+        stylesheet = self.load_css(f"{os.path.dirname(__file__)}/css/home.css")
         app.setStyleSheet(stylesheet)
 
+
     def about_popup(self):
-        about = QMessageBox()
-        about.setIcon(QMessageBox.Information)
-        about.setWindowTitle("Information")
-        about.setText("This is an informational message!")
-        about.setStandardButtons(QMessageBox.Ok)
-        about.exec_()
+        PopupWindow.show_popup(self)
 
     def draw_scannerpage(self):
         scanner_window = QHBoxLayout()
     def draw_deckpage(self):
         deck_window = QHBoxLayout()
 
+#mini class for the About Popup Window
+class PopupWindow(QWidget):
+    def __init__(self):
+        super().__init__()
 
+        self.setWindowTitle("About the Program")
+        self.setGeometry(400, 400, 300, 200)
+
+        layout = QVBoxLayout()
+        label = QLabel("This is a personal project to learn python and understand some of its many libraries!", self)
+        label.setWordWrap(True)
+        layout.addWidget(label)
+
+        label2 = QLabel("Property of Spencer Bone", self)
+        layout.addWidget(label2)
+
+        close_button = QPushButton("Close", self)
+        close_button.setFixedWidth(50)
+        close_button.clicked.connect(self.close)
+        layout.addWidget(close_button, alignment=Qt.AlignRight)
+
+        self.setLayout(layout)
+    def show_popup(self):
+        # Show the custom popup window
+        self.popup = PopupWindow()
+        self.popup.show()
 
 app = QApplication(sys.argv)
 window = MagicGUI()
