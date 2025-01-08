@@ -1,0 +1,35 @@
+/* home page css */
+
+#title {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 50px;
+    font-weight: bold;
+    margin: 0 auto;
+    padding: 10px, 10px;
+}
+
+#homepage_buttons {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 25px;
+    font-weight: bold;
+    background-color: maroon;
+    color: white;
+    border-radius: 5px;
+    padding: 10px 10px;
+    margin: 0 auto;
+}
+
+#homepage_buttons:hover {
+    background-color: rgb(59, 6, 6);
+}
+
+#about_button {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 15px;
+    background-color: maroon;
+    color: white;
+    border-radius: 5px;
+    padding: 10px 10px;
+    margin: 10px auto;
+    max-width: 100px;
+}
