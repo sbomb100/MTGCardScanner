@@ -109,12 +109,10 @@ class CardScanner:
             for _ in range(5)]
         name_counts = Counter(card_name)
         most_common_name, count = name_counts.most_common(1)[0]
-        if count > 2:  # Ensure at least 2 out of 3 scans agree
+        if count > 2:  # Ensure at least 3 out of 5 scans agree
             return most_common_name
         else:
             return ""
-
-
 
     #check the scryfall databse for the card via name
     def update_database(self, card_data):

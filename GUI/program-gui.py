@@ -95,7 +95,7 @@ class MagicGUI(QWidget):
     def update_frame(self):
         """Capture a frame and update the GUI."""
         if not self.scanner_running:
-            black_square = np.zeros((480, 640, 3), dtype=np.uint8)
+            black_square = np.zeros((640, 480, 3), dtype=np.uint8)
 
             # Convert to QImage
             height, width, channel = black_square.shape
@@ -109,11 +109,11 @@ class MagicGUI(QWidget):
             if frame is not None:
                 # Convert the frame to RGB
                 frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-
+                rotated = cv2.rotate(frame_rgb, cv2.ROTATE_90_CLOCKWISE)
                 # Convert the frame to QImage
-                height, width, channel = frame_rgb.shape
+                height, width, channel = rotated.shape
                 bytes_per_line = channel * width
-                q_image = QImage(frame_rgb.data, width, height, bytes_per_line, QImage.Format_RGB888)
+                q_image = QImage(rotated.data, width, height, bytes_per_line, QImage.Format_RGB888)
 
                 # Display the frame in the QLabel
                 self.video_label.setPixmap(QPixmap.fromImage(q_image))
@@ -158,29 +158,30 @@ class MagicGUI(QWidget):
        
         #Camera Side Vertical Box ----
         camera_box = QVBoxLayout()
-
-        #Last Card Scanned Vertical Box
-        last_scanned_box = QVBoxLayout()
         self.video_label = QLabel("Camera Feed")
-        black_square = np.zeros((480, 640, 3), dtype=np.uint8)
+        black_square = np.zeros((640, 480, 3), dtype=np.uint8)
         # Convert to QImage
         height, width, channel = black_square.shape
         bytes_per_line = channel * width
         q_image = QImage(black_square.data, width, height, bytes_per_line, QImage.Format_RGB888)
 
-            # Update the QLabel
         self.video_label.setPixmap(QPixmap.fromImage(q_image))
         self.video_label.setAlignment(Qt.AlignCenter)
-        last_scanned_box.addWidget(self.video_label)
+        camera_box.addWidget(self.video_label)
 
+        
+        self.toggle_button = QPushButton("Start Scanner")
+        self.toggle_button.clicked.connect(self.toggle_scanner)
+        camera_box.addWidget(self.toggle_button)
+
+        #Last Card Scanned Vertical Box
+        last_scanned_box = QVBoxLayout()
+
+        
         self.result_label = QLabel("Card Analysis Result")
         self.result_label.setAlignment(Qt.AlignCenter)
         last_scanned_box.addWidget(self.result_label)
-
-        self.toggle_button = QPushButton("Start Scanner")
-        self.toggle_button.clicked.connect(self.toggle_scanner)
-        last_scanned_box.addWidget(self.toggle_button)
-
+        
         scanner_window.addLayout(camera_box)
         scanner_window.addLayout(last_scanned_box)
         self.setLayout(scanner_window)
