@@ -3,6 +3,9 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 import sys
 import os
+import cv2
+from scanner import CardScanner
+import numpy as np
 
 class MagicGUI(QWidget):
     
@@ -78,10 +81,74 @@ class MagicGUI(QWidget):
         QWidget().setLayout(self.layout())
         layout = QGridLayout(self)
         QObjectCleanupHandler().add(self.layout())
+    
+
+    #SCANNER METHODS
+    def setup_scanner(self):
+        # Initialize the scanner
+        self.scanner = CardScanner()
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.update_frame)
+        self.scanner_running = False
+
+    def update_frame(self):
+        """Capture a frame and update the GUI."""
+        if not self.scanner_running:
+            black_square = np.zeros((480, 640, 3), dtype=np.uint8)
+
+            # Convert to QImage
+            height, width, channel = black_square.shape
+            bytes_per_line = channel * width
+            q_image = QImage(black_square.data, width, height, bytes_per_line, QImage.Format_RGB888)
+
+            # Update the QLabel
+            self.video_label.setPixmap(QPixmap.fromImage(q_image))
+        else:
+            frame = self.scanner.read_frame()
+            if frame is not None:
+                # Convert the frame to RGB
+                frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+                # Convert the frame to QImage
+                height, width, channel = frame_rgb.shape
+                bytes_per_line = channel * width
+                q_image = QImage(frame_rgb.data, width, height, bytes_per_line, QImage.Format_RGB888)
+
+                # Display the frame in the QLabel
+                self.video_label.setPixmap(QPixmap.fromImage(q_image))
+
+                # Analyze the frame for card information
+                result = self.scanner.analyze_card(frame)
+                self.result_label.setText(result)
+            else:
+                self.toggle_scanner()
+
+    def toggle_scanner(self):
+        """Start or stop the scanner."""
+        if self.scanner_running:
+            self.timer.stop()
+            self.scanner_running = False
+            self.update_frame() #extra update to go back to black screen
+            self.toggle_button.setText("Start Scanner")
+            self.scanner.shutdown()
+
+        else:
+            self.timer.start(30)  # Update every 30ms
+            self.scanner_running = True
+            self.toggle_button.setText("Stop Scanner")
+
+
+    def closeEvent(self, event):
+        """Release resources on window close."""
+        if self.scanner_running:
+            self.scanner.shutdown()
+        super().closeEvent(event)
+
 
     #Changing the layout to the scanner page
     def draw_scannerpage(self):
-        
+        self.setup_scanner()
+
         self.delete_old_layout()
         scanner_window = QHBoxLayout()
        
@@ -90,6 +157,25 @@ class MagicGUI(QWidget):
 
         #Last Card Scanned Vertical Box
         last_scanned_box = QVBoxLayout()
+        self.video_label = QLabel("Camera Feed")
+        black_square = np.zeros((480, 640, 3), dtype=np.uint8)
+        # Convert to QImage
+        height, width, channel = black_square.shape
+        bytes_per_line = channel * width
+        q_image = QImage(black_square.data, width, height, bytes_per_line, QImage.Format_RGB888)
+
+            # Update the QLabel
+        self.video_label.setPixmap(QPixmap.fromImage(q_image))
+        self.video_label.setAlignment(Qt.AlignCenter)
+        last_scanned_box.addWidget(self.video_label)
+
+        self.result_label = QLabel("Card Analysis Result")
+        self.result_label.setAlignment(Qt.AlignCenter)
+        last_scanned_box.addWidget(self.result_label)
+
+        self.toggle_button = QPushButton("Start Scanner")
+        self.toggle_button.clicked.connect(self.toggle_scanner)
+        last_scanned_box.addWidget(self.toggle_button)
 
         scanner_window.addLayout(camera_box)
         scanner_window.addLayout(last_scanned_box)
