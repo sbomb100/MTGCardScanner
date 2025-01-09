@@ -142,6 +142,7 @@ class CardScanner:
                     WHERE id = ?
                     """, (new_count, card[0]))
                     self.my_cards.commit()
+                    return 0
                 else:
                     # If the card does not exist, insert a new card with count
                     print("new card!\n")
@@ -161,8 +162,12 @@ class CardScanner:
                     ))
                     print(f"Card Added -- {card[1]}")
                     self.my_cards.commit()
+                    return 1
             else:
-                print(f"Card not found")
+                print(f"Price not found")
+                return -1
+        else:
+            return -1
 
         
     def __init__(self, camera_index=1):
@@ -201,14 +206,20 @@ class CardScanner:
                 #print(f"{card_data} is {last_card} \n")
                 if card_data.strip() == "":
                     #print("DEBUG: Card data is empty, skipping frame.")
-                    return None
+                    return ""
 
                 if card_data.strip() == self.last_card:
                     #print("DEBUG: Duplicate card detected, skipping database update.")
-                    return None
+                    return ""
                 else: 
                     #now that we have the name, check databse
-                    return self.update_database(card_data)
+                    ret = self.update_database(card_data)
+                    if ret > -1:
+                        return card_data.strip()
+                    else:
+                        return ""
+            else:
+                return ""
                     
             
     def shutdown(self):

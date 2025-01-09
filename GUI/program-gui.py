@@ -90,6 +90,7 @@ class MagicGUI(QWidget):
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_frame)
         self.scanner_running = False
+        self.last_card = ""
 
     def update_frame(self):
         """Capture a frame and update the GUI."""
@@ -119,7 +120,10 @@ class MagicGUI(QWidget):
 
                 # Analyze the frame for card information
                 result = self.scanner.analyze_card(frame)
-                self.result_label.setText(result)
+                
+                if result != "" and result != self.last_card:
+                    self.result_label.setText(result)
+                    self.last_card = result
             else:
                 self.toggle_scanner()
 
