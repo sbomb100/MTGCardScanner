@@ -6,6 +6,7 @@ import os
 import cv2
 from scanner import CardScanner
 import numpy as np
+import requests
 
 class MagicGUI(QWidget):
     
@@ -23,6 +24,7 @@ class MagicGUI(QWidget):
     def __init__(self):
         super().__init__()
         self.init_ui()
+        self.scanner_running = False
     
     def init_ui(self):
         self.setWindowTitle("MTG GUI")
@@ -93,7 +95,7 @@ class MagicGUI(QWidget):
         self.last_card = ""
 
     def update_frame(self):
-        """Capture a frame and update the GUI."""
+        #Capture a frame and update the GUI.
         if not self.scanner_running:
             black_square = np.zeros((640, 480, 3), dtype=np.uint8)
 
@@ -122,20 +124,26 @@ class MagicGUI(QWidget):
                 result = self.scanner.analyze_card(frame)
                 
                 if result != "" and result != self.last_card:
-                    self.result_label.setText(result)
+                    self.result_label.setText(result[1])
                     self.last_card = result
+
+                    response = requests.get(result[7])
+                    if response.status_code == 200:
+                        pixmap = QPixmap()
+                        pixmap.loadFromData(response.content)
+                        self.last_card_img.setPixmap(pixmap)
+                        self.last_card_img.setAlignment(Qt.AlignCenter)
             else:
                 self.toggle_scanner()
 
     def toggle_scanner(self):
-        """Start or stop the scanner."""
+        #Start or stop the scanner.
         if self.scanner_running:
             self.timer.stop()
             self.scanner_running = False
             self.update_frame() #extra update to go back to black screen
             self.toggle_button.setText("Start Scanner")
             self.scanner.shutdown()
-
         else:
             self.timer.start(30)  # Update every 30ms
             self.scanner_running = True
@@ -143,11 +151,11 @@ class MagicGUI(QWidget):
 
 
     def closeEvent(self, event):
-        """Release resources on window close."""
+        #Release resources on window close.
         if self.scanner_running:
             self.scanner.shutdown()
         super().closeEvent(event)
-
+        
 
     #Changing the layout to the scanner page
     def draw_scannerpage(self):
@@ -174,10 +182,15 @@ class MagicGUI(QWidget):
         self.toggle_button.clicked.connect(self.toggle_scanner)
         camera_box.addWidget(self.toggle_button)
 
+        
+
         #Last Card Scanned Vertical Box
         last_scanned_box = QVBoxLayout()
 
-        
+        self.last_card_img = QLabel("Last Card Image")
+        self.last_card_img.setAlignment(Qt.AlignCenter)
+        last_scanned_box.addWidget(self.last_card_img)
+
         self.result_label = QLabel("Card Analysis Result")
         self.result_label.setAlignment(Qt.AlignCenter)
         last_scanned_box.addWidget(self.result_label)

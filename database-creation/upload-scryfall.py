@@ -2,11 +2,11 @@ import json
 import sqlite3
 
 # Load the JSON file
-with open("../../cards.json", "r", encoding="utf-8") as file:
+with open("../cards.json", "r", encoding="utf-8") as file:
     card_data = json.load(file)
 
 # Connect to SQLite database (or create it if it doesn't exist)
-conn = sqlite3.connect("../databases/cards.db")
+conn = sqlite3.connect("./databases/scryfall.db")
 cursor = conn.cursor()
 
 # Create tables
@@ -18,7 +18,8 @@ CREATE TABLE IF NOT EXISTS cards (
     type TEXT,
     rarity TEXT,
     mana_cost TEXT,
-    oracle_text TEXT
+    oracle_text TEXT,
+    card_img TEXT
 )
 """)
 
@@ -36,9 +37,13 @@ CREATE TABLE IF NOT EXISTS prices (
 for card in card_data:
     # Use the 'id' field from the JSON as the primary key for the card
     
+   
+    card_img = card.get("image_uris", {}).get("normal")
+
+
     cursor.execute("""
-    INSERT INTO cards (id, name, set_name, type, rarity, mana_cost, oracle_text)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO cards (id, name, set_name, type, rarity, mana_cost, oracle_text, card_img)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     """, (
         card.get("id"),  # Use the 'id' (UUID) from the JSON
         card.get("name"),
@@ -46,7 +51,8 @@ for card in card_data:
         card.get("type"),
         card.get("rarity"),
         card.get("mana_cost"),
-        card.get("oracle_text")
+        card.get("oracle_text"),
+        card_img
     ))
     
     # Insert prices if available

@@ -24,8 +24,6 @@ class CardScanner:
         imgDil = cv2.dilate(imgCanny, kernel, iterations=1)
     
         #makes list of shapes in the image in a hierarchy  
-        #cv2.RETR_EXTERNAL - outermost shapes
-        #cv2.CHAIN_APPROX_SIMPLE - remove redundant straight lines
         contours, _ = cv2.findContours(imgDil, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         
         if contours:
@@ -53,7 +51,6 @@ class CardScanner:
         return rect
 
     def warp_card(self, img, contours):
-        # Reshape the contour to a 4x2 format
         pts = contours.reshape(4, 2)
 
         # make sure points are ordered
@@ -85,38 +82,34 @@ class CardScanner:
         if width > height:  # Landscape orientation
             img = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
 
-        # Dynamically calculate ROI based on card dimensions
-        roi_x = int(0.07 * img.shape[1])  # 8% from the left
-        roi_y = int(0.05 * img.shape[0])  # 5% from the top
-        roi_w = int(0.75 * img.shape[1])  # 85% width TODO EDIT TO FIT LONGER CARDS
-        roi_h = int(0.06 * img.shape[0])  # 15% height
+        # dynamically calculate ROI based on card dimensions
+        roi_x = int(0.07 * img.shape[1])  
+        roi_y = int(0.05 * img.shape[0])  
+        roi_w = int(0.75 * img.shape[1])  
+        roi_h = int(0.06 * img.shape[0])  
 
-        # Crop the ROI from the warped card image
         card_name_roi = img[roi_y:roi_y + roi_h, roi_x:roi_x + roi_w]
         cv2.imshow("name", card_name_roi)
-        # Convert to grayscale for better OCR results
         gray = cv2.cvtColor(card_name_roi, cv2.COLOR_BGR2GRAY)
         # Apply thresholding
         _, binary = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-        # Denoise
-        
+  
     
         cv2.imshow("name", binary)
-        # Perform OCR on the cropped ROI
- 
+  
         card_name = [
             re.sub('[^a-zA-Z,+\', ]', '', pytesseract.image_to_string(binary)).strip() 
             for _ in range(5)]
         name_counts = Counter(card_name)
         most_common_name, count = name_counts.most_common(1)[0]
-        if count > 2:  # Ensure at least 3 out of 5 scans agree
+        if count > 2:  # at least 3 out of 5 scans agree
             return most_common_name
         else:
             return ""
 
     #check the scryfall databse for the card via name
     def update_database(self, card_data):
-        self.all_cursor.execute("""SELECT id, name, set_name, type, rarity, mana_cost, oracle_text
+        self.all_cursor.execute("""SELECT id, name, set_name, type, rarity, mana_cost, oracle_text, card_img
                         FROM cards WHERE name = ?""", (card_data,))
         card = self.all_cursor.fetchone()
         if card:
@@ -146,15 +139,15 @@ class CardScanner:
                     WHERE id = ?
                     """, (new_count, card[0]))
                     self.my_cards.commit()
-                    return 0
+                    return card
                 else:
                     # If the card does not exist, insert a new card with count
                     print("new card!\n")
                     self.my_cursor.execute("""
-                    INSERT INTO cards (id, name, set_name, type, rarity, mana_cost, oracle_text, count)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    INSERT INTO cards (id, name, set_name, type, rarity, mana_cost, oracle_text, card_img, count)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """, (
-                        *card[:7],
+                        *card[:8],
                         1
                     ))
 
@@ -166,7 +159,7 @@ class CardScanner:
                     ))
                     print(f"Card Added -- {card[1]}")
                     self.my_cards.commit()
-                    return 1
+                    return card
             else:
                 print(f"Price not found")
                 return -1
@@ -178,7 +171,7 @@ class CardScanner:
         self.threshold1 = 50
         self.threshold2 = 150
         self.cap = cv2.VideoCapture(camera_index)
-        self.all_cards = sqlite3.connect("databases/cards.db")
+        self.all_cards = sqlite3.connect("databases/scryfall.db")
         self.my_cards = sqlite3.connect("databases/MTGPersonalCollection.db")
         self.last_card = ""
         self.all_cursor = self.all_cards.cursor()
@@ -218,8 +211,8 @@ class CardScanner:
                 else: 
                     #now that we have the name, check databse
                     ret = self.update_database(card_data)
-                    if ret > -1:
-                        return card_data.strip()
+                    if ret != -1:
+                        return ret
                     else:
                         return ""
             else:
