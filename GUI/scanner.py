@@ -10,8 +10,6 @@ import sqlite3
 
 class CardScanner:
     
-
-    last_card = ""
     pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
     def preprocess_image(self, img):
@@ -114,13 +112,11 @@ class CardScanner:
 
     #check the scryfall databse for the card via name
     def update_database(self, card_data):
-        global last_card
-
         self.all_cursor.execute("""SELECT id, name, set_name, type, rarity, mana_cost, oracle_text
                         FROM cards WHERE name = ?""", (card_data,))
         card = self.all_cursor.fetchone()
         if card:
-            last_card = card_data.strip()
+            self.last_card = card_data.strip()
             print(f"Found card: {card}")
             #fetch the price
             self.all_cursor.execute("""
@@ -169,13 +165,13 @@ class CardScanner:
                 print(f"Card not found")
 
         
-    def __init__(self, camera_index=0):
+    def __init__(self, camera_index=1):
         self.threshold1 = 50
         self.threshold2 = 150
         self.cap = cv2.VideoCapture(camera_index)
         self.all_cards = sqlite3.connect("databases/cards.db")
         self.my_cards = sqlite3.connect("databases/MTGPersonalCollection.db")
-
+        self.last_card = ""
         self.all_cursor = self.all_cards.cursor()
         self.my_cursor = self.my_cards.cursor()
 
@@ -207,7 +203,7 @@ class CardScanner:
                     #print("DEBUG: Card data is empty, skipping frame.")
                     return None
 
-                if card_data.strip() == last_card:
+                if card_data.strip() == self.last_card:
                     #print("DEBUG: Duplicate card detected, skipping database update.")
                     return None
                 else: 
