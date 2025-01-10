@@ -7,7 +7,6 @@ import cv2
 from scanner import CardScanner
 import numpy as np
 import requests
-
 class MagicGUI(QWidget):
     
     #load the css file for the page requested
@@ -29,6 +28,7 @@ class MagicGUI(QWidget):
     def init_ui(self):
         self.setWindowTitle("MTG GUI")
         self.setGeometry(100, 100, 800, 700)
+        self.setLayout(QHBoxLayout())
         self.draw_homepage()
 
     #All Homepage Functions ----------------
@@ -68,7 +68,7 @@ class MagicGUI(QWidget):
         deck_button.setCursor(Qt.PointingHandCursor)
 
 
-        self.setLayout(main_window)
+        self.layout().addLayout(main_window)
 
         #Load Homepage CSS
         stylesheet = self.load_css(f"{os.path.dirname(__file__)}/css/home.css")
@@ -78,10 +78,20 @@ class MagicGUI(QWidget):
     def about_popup(self):
         PopupWindow.show_popup(self)
 
-    def delete_old_layout(self):
-        #delete old layout
-        QWidget().setLayout(self.layout())
-        QObjectCleanupHandler().add(self.layout())
+    def clear_layout(self, layout):
+    # Iterate through all child widgets and layouts in the layout
+        if layout is not None:
+            while layout.count():
+                item = layout.takeAt(0)  # Get the first item in the layout
+
+                # If the item is a widget, delete it
+                if item.widget():
+                    widget = item.widget()
+                    widget.deleteLater()  # Safely delete the widget
+                # If the item is a layout, clear its child items
+                elif item.layout():
+                    self.clear_layout(item.layout())  # Recursively clear nested layouts
+                    item.layout().deleteLater()  # Delete the sub-layout
     
 
     #SCANNER METHODS
@@ -152,7 +162,6 @@ class MagicGUI(QWidget):
 
     def closeEvent(self, event):
         #Release resources on window close.
-        
         if self.scanner_running:
             self.scanner_open = False
             self.scanner.shutdown()
@@ -161,7 +170,7 @@ class MagicGUI(QWidget):
     def change_page(self, index):
         if self.scanner_open == True:
             self.scanner_open = False
-            self.scanner.shutdown()
+            self.close_scanner()
         
         
         if index == 0:
@@ -189,14 +198,18 @@ class MagicGUI(QWidget):
         search_bar.setPlaceholderText("Search...")
         header_box.addWidget(search_bar)
 
+        search_button = QPushButton("Search")
+        #search_button.clicked.connect(self.perform_search)
+        header_box.addWidget(search_button)
+
         return header_box
 
 
     #Changing the layout to the scanner page
     def draw_scannerpage(self):
-        self.setup_scanner()
-
-        self.delete_old_layout()
+        #self.setup_scanner()
+        self.scanner_open = True
+        self.clear_layout(self.layout())
         main_scanner_window = QVBoxLayout()
         
         main_scanner_window.addLayout(self.draw_header(0))
@@ -237,11 +250,16 @@ class MagicGUI(QWidget):
         scanner_window.addLayout(last_scanned_box)
         main_scanner_window.addLayout(scanner_window)
 
-        self.setLayout(main_scanner_window)
+        self.layout().addLayout(main_scanner_window)
     
+    def close_scanner(self):
+        self.scanner_running = False
+         # Make sure to call shutdown to release resource
+
     #Changing the layout to the deck page
     def draw_deckpage(self):
-        self.delete_old_layout()
+        self.scanner_open = False
+        self.clear_layout(self.layout())
 
         deck_window = QHBoxLayout()
 
@@ -249,8 +267,7 @@ class MagicGUI(QWidget):
         #Left Side Vertical Box
 
         #Right Side Vertical Box
-
-        self.setLayout(deck_window)
+        self.layout().addLayout(deck_window)
 
 #mini class for the About Popup Window
 class PopupWindow(QWidget):
@@ -282,4 +299,7 @@ class PopupWindow(QWidget):
 app = QApplication(sys.argv)
 window = MagicGUI()
 window.show()
+
+
 sys.exit(app.exec_())
+# Stop tracing memory allocations
