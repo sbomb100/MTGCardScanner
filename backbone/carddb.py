@@ -8,5 +8,5 @@ class CardDatabases:
         self.cards_cursor = self.db.cursor()
     
     def close_db(self):
-        self.connection.close()
+        self.my_cards.close()
         self.db.close()
