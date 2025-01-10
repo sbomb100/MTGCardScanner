@@ -193,7 +193,7 @@ class MagicGUI(QWidget):
         if self.scanner_running:
             self.timer.stop()
             self.scanner.shutdown()
-            
+
         self.db.close_db()
         super().closeEvent(event)
         
@@ -230,7 +230,7 @@ class MagicGUI(QWidget):
         header_box.addWidget(self.search_bar)
 
         search_button = QPushButton("Search")
-        #search_button.clicked.connect(self.perform_search)
+        search_button.clicked.connect(partial(self.search))
         header_box.addWidget(search_button)
 
         return header_box
@@ -239,6 +239,7 @@ class MagicGUI(QWidget):
         InfoWindow.show_popup(self, "Previous Scans", self.list_oldscans)
             
     #Changing the layout to the scanner page
+
     def draw_scannerpage(self):
         self.page_name = "scanner"
         self.setup_scanner()
@@ -310,18 +311,23 @@ class MagicGUI(QWidget):
         
         if event.type() == QtCore.QEvent.KeyPress and obj is self.search_bar:
             if event.key() == QtCore.Qt.Key_Return and self.search_bar.hasFocus():
-                print(self.search_bar.text())
-                #TODO LINK TO DECK MAKER
+                self.search()
                 return super().eventFilter(obj, event)
         if event.type() == QtCore.QEvent.KeyPress and self.page_name == "deck":
             if event.key() == QtCore.Qt.Key_Return and self.file_box.hasFocus():
-                self.search(self.file_box.text())
+                self.search()
                 #TODO LINK TO DECK MAKER
                 return super().eventFilter(obj, event)
         return super().eventFilter(obj, event)
     
-    #def search(self, card_name):
-    #    self.
+    def search(self):
+        card = self.db.search_card_by_name(self.search_bar.text())
+        if card is None:
+            InfoWindow.show_popup(self, "Search Result", "No Such Card Found, Be Sure to have EXACT spelling")
+        else:
+            CardSearchWindow.show_popup(self, card)
+
+        
 
     #Changing the layout to the deck page
     def draw_deckpage(self):
@@ -384,7 +390,7 @@ class InfoWindow(QWidget):
         self.setGeometry(400, 400, 300, 200)
 
         layout = QVBoxLayout()
-        label = QLabel(text, self)
+        label = QLabel(text)
         label.setWordWrap(True)
         layout.addWidget(label)
 
@@ -397,6 +403,39 @@ class InfoWindow(QWidget):
 
     def show_popup(self, header, text):
         self.popup = InfoWindow(header, text)
+        self.popup.show()
+
+class CardSearchWindow(QWidget):
+    def __init__(self, card):
+        super().__init__()
+
+        self.setWindowTitle("Card Search Result")
+        self.setGeometry(800, 200, 400, 600)
+
+        layout = QVBoxLayout()
+
+        card_img = QLabel("Card Image Not Found")
+        layout.addWidget(card_img)
+        response = requests.get(card[7])
+        
+        if response.status_code == 200:
+            pixmap = QPixmap()
+            pixmap.loadFromData(response.content)
+            card_img.setPixmap(pixmap)
+
+        label = QLabel((card[1] + f": nonfoil: {card[8]}, foil: {card[9]}"))
+        label.setWordWrap(True)
+        layout.addWidget(label)
+
+        close_button = QPushButton("Close", self)
+        close_button.setFixedWidth(50)
+        close_button.clicked.connect(self.close)
+        layout.addWidget(close_button, alignment=Qt.AlignRight)
+
+        self.setLayout(layout)
+
+    def show_popup(self, card):
+        self.popup = CardSearchWindow(card)
         self.popup.show()
 
 app = QApplication(sys.argv)
