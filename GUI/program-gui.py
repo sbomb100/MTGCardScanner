@@ -81,7 +81,6 @@ class MagicGUI(QWidget):
     def delete_old_layout(self):
         #delete old layout
         QWidget().setLayout(self.layout())
-        layout = QGridLayout(self)
         QObjectCleanupHandler().add(self.layout())
     
 
@@ -92,6 +91,7 @@ class MagicGUI(QWidget):
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_frame)
         self.scanner_running = False
+        self.scanner_open = True
         self.last_card = ""
 
     def update_frame(self):
@@ -152,18 +152,56 @@ class MagicGUI(QWidget):
 
     def closeEvent(self, event):
         #Release resources on window close.
+        
         if self.scanner_running:
+            self.scanner_open = False
             self.scanner.shutdown()
         super().closeEvent(event)
         
+    def change_page(self, index):
+        if self.scanner_open == True:
+            self.scanner_open = False
+            self.scanner.shutdown()
+        
+        
+        if index == 0:
+            self.draw_scannerpage()
+        elif index == 1:
+            self.draw_deckpage()
+
+    def draw_header(self, page_num):
+        header_box = QHBoxLayout()
+        # logo, dropdown box, search bar
+        logo_label = QLabel()
+        #TODO: MAKE LOGO
+        #pixmap = QPixmap("logo.png")  # Replace with your logo file
+        #logo_label.setPixmap(pixmap)
+        logo_label.setText("MTG-PC")
+        header_box.addWidget(logo_label)
+
+        dropdown = QComboBox()
+        dropdown.addItems(["Scanner", "Deck Finder"])
+        dropdown.setCurrentIndex(page_num)
+        dropdown.currentIndexChanged.connect(self.change_page)
+        header_box.addWidget(dropdown)
+
+        search_bar = QLineEdit()
+        search_bar.setPlaceholderText("Search...")
+        header_box.addWidget(search_bar)
+
+        return header_box
+
 
     #Changing the layout to the scanner page
     def draw_scannerpage(self):
         self.setup_scanner()
 
         self.delete_old_layout()
+        main_scanner_window = QVBoxLayout()
+        
+        main_scanner_window.addLayout(self.draw_header(0))
         scanner_window = QHBoxLayout()
-       
+
         #Camera Side Vertical Box ----
         camera_box = QVBoxLayout()
         self.video_label = QLabel("Camera Feed")
@@ -197,13 +235,17 @@ class MagicGUI(QWidget):
         
         scanner_window.addLayout(camera_box)
         scanner_window.addLayout(last_scanned_box)
-        self.setLayout(scanner_window)
+        main_scanner_window.addLayout(scanner_window)
+
+        self.setLayout(main_scanner_window)
     
     #Changing the layout to the deck page
     def draw_deckpage(self):
         self.delete_old_layout()
+
         deck_window = QHBoxLayout()
 
+        deck_window.addLayout(self.draw_header(1))
         #Left Side Vertical Box
 
         #Right Side Vertical Box
