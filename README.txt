@@ -20,11 +20,7 @@ Possible add-ons:
 #NEXT STEPS 
 #- Possibly multithread image processing for card titles to make it so it can read a card thats upside down or right side up
 
-#- combine the camera and deck query features to make it easier to go between them.
-#  > GUI? some kind of user interaction for easier use
-#  > adjust the text docuement to be a shown display as well, allow choice of text doc, edit prompts to be easier to not mess up
-#
-#- perhaps shift into website or app to make it easier to use
+#- perhaps shift into website or mobile app to make it easier to use
 #  > i dont know ios development
 #  > i do not have an android
 #  > website would require my camera to work still

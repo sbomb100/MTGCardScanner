@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
+from PyQt5 import QtCore
 import sys
 import os
 import cv2
@@ -157,7 +158,6 @@ class MagicGUI(QWidget):
                         self.list_oldscans = result[1] + "\n"
                     
                     
-
                     response = requests.get(result[7])
                     if response.status_code == 200:
                         pixmap = QPixmap()
@@ -179,7 +179,7 @@ class MagicGUI(QWidget):
         else:
             self.toggle_button.setText("Starting Scanner...")
             self.scanner.turn_on()
-            self.timer.start(30)  # Update every 30ms
+            self.timer.start(20)  # Update every 30ms
             self.scanner_running = True
             self.toggle_button.setText("Stop Scanner")
             
@@ -297,23 +297,68 @@ class MagicGUI(QWidget):
         self.layout().addLayout(main_scanner_window)
     
     def close_scanner(self):
-        
         if self.scanner_running:
             self.scanner.turn_off()
         self.scanner_running = False
-         # Make sure to call shutdown to release resource
 
+
+    def eventFilter(self, obj, event):
+        if event.type() == QtCore.QEvent.KeyPress and obj is self.file_box:
+            if event.key() == QtCore.Qt.Key_Return and self.file_box.hasFocus():
+                print(self.file_box.text())
+                #TODO LINK TO DECK MAKER
+        return super().eventFilter(obj, event)
+    
     #Changing the layout to the deck page
     def draw_deckpage(self):
         self.scanner_open = False
         self.clear_layout(self.layout())
 
-        deck_window = QHBoxLayout()
+        deck_window = QVBoxLayout()
 
         deck_window.addLayout(self.draw_header(1))
+
+        middle_screen = QHBoxLayout()
         #Left Side Vertical Box
+            #paste box
+        left_side = QVBoxLayout()
+        paste_window = QVBoxLayout()
+        paste_label = QLabel("Paste Deck List:")
+        paste_window.addWidget(paste_label)
+        self.paste_box =  QTextEdit()
+        self.paste_box.setPlaceholderText("Paste your wanted deck here...")
+        paste_window.addWidget(self.paste_box)
+        paste_button = QPushButton("Process Card List")
+        #self.process_button.clicked.connect(self.process_cards)
+        paste_window.addWidget(paste_button)
+        left_side.addLayout(paste_window)
+
+        or_label = QLabel("------- OR -------")
+        left_side.addWidget(or_label)
+
+            #file name
+        file_window = QVBoxLayout()
+        file_label = QLabel("Text File Name Here:")
+        file_window.addWidget(file_label)
+        self.file_box =  QLineEdit()
+        self.file_box.setPlaceholderText("Text File Name Here:")
+        self.file_box.installEventFilter(self)
+
+        file_window.addWidget(self.file_box)
+        left_side.addLayout(file_window)
+        middle_screen.addLayout(left_side)
 
         #Right Side Vertical Box
+        right_side = QVBoxLayout()
+        self.output_box =  QTextEdit()
+        self.output_box.setPlaceholderText("Deck Output Here...")
+        right_side.addWidget(self.output_box)
+        outputDL_button = QPushButton("Download Deck as Text File")
+        #self.outputDL_button.clicked.connect(self.download_deck_output)
+        right_side.addWidget(outputDL_button)
+        middle_screen.addLayout(right_side)
+
+        deck_window.addLayout(middle_screen)
         self.layout().addLayout(deck_window)
 
 #mini class for the About Popup Window
