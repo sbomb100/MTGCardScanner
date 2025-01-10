@@ -1,7 +1,7 @@
 
 import sqlite3
 
-conn = sqlite3.connect("../databases/MTGPersonalCollection.db")
+conn = sqlite3.connect("./databases/MTGPersonalCollection.db")
 cursor = conn.cursor()
 
 # Create tables
@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS cards (
     rarity TEXT,
     mana_cost TEXT,
     oracle_text TEXT,
+    card_img TEXT,
     count INTEGER
 )
 """)
