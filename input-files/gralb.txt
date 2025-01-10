@@ -1,0 +1,97 @@
+1 Glarb, Calamity's Augur (BLB) 215
+1 Amphibian Downpour (PMH3) 51s *F*
+1 Analyze the Pollen (MKM) 150
+1 Arcane Signet (LCC) 299
+1 Barren Moor (DSC) 262
+1 Binding the Old Gods (KHM) 206
+1 Breeding Pool (GTC) 240
+1 Case of the Locked Hothouse (MKM) 155
+1 Clement, the Worrywort (BLB) 209
+1 Clifftop Lookout (BLB) 168
+1 Command Tower (LCC) 325
+1 Culling Ritual (DSC) 85
+1 Dakmor Salvage (M3C) 333
+1 Deadly Rollick (C20) 42
+1 Deathcap Glade (VOW) 261
+1 Dour Port-Mage (BLB) 47
+1 Drag to the Roots (DSK) 213
+1 Dread Return (CMM) 153
+1 Dreamdew Entrancer (BLB) 211
+1 Dreamroot Cascade (M3C) 338
+1 Enhanced Surveillance (MKC) 102
+1 Excavating Anurid (MH1) 163
+1 Exotic Orchard (MKC) 260
+1 Farseek (C17) 149
+1 Force of Vigor (OTP) 29
+1 Foreboding Landscape (MH3) 221
+2 Forest (FDN) 281
+1 Froghemoth (AFR) 184
+1 Frogify (ELD) 47
+1 Generous Ent (LTR) 169
+1 Grolnok, the Omnivore (VOW) 324
+1 Growth Spiral (RNA) 178
+1 Hedge Maze (PMKM) 262p
+1 Hedge Shredder (PDSK) 183p
+2 Island (DSK) 280
+1 Jade Avenger (MH2) 356
+1 Kindred Discovery (LCC) 159
+1 Life from the Loam (RVR) 350
+1 Lilypad Village (BLB) 255
+1 Lilysplash Mentor (BLB) 222
+1 Lonely Sandbar (MKC) 273
+1 Long River Lurker (BLB) 57
+1 Long River's Pull (BLB) 58
+1 Lórien Revealed (LTR) 60
+1 Masked Vandal (KHM) 184
+1 Misty Rainforest (MM3) 240
+1 Morphic Pool (CLB) 357
+1 Muldrotha, the Gravetide (FDN) 243
+1 Mulldrifter (MKC) 111
+1 Murkfiend Liege (C13) 231
+1 Mystic Sanctuary (MKC) 277
+1 Nature's Lore (MKC) 178
+1 Neerdiv, Devious Diver (J25) 36
+1 Oakhollow Village (BLB) 258
+1 Overgrown Tomb (RVR) 283
+1 Patchwork Banner (BLB) 247
+1 Path of Ancestry (LCC) 346
+1 Poison Dart Frog (M3C) 238
+1 Polliwallop (BLB) 189
+1 Polluted Delta (MH3) 224
+1 Polymorphist's Jest (M15) 75
+1 Pond Prophet (BLB) 229
+1 Psychic Frog (MH3) 199
+1 Rampant Frogantua (M3C) 118
+1 Reflections of Littjara (LCC) 168
+1 Rejuvenating Springs (LTC) 325
+1 Rivendell (LTR) 259
+1 Shifting Woodland (MH3) 228
+1 Shipwreck Marsh (MID) 267
+1 Shire Terrace (LTR) 261
+1 Shriekmaw (MKC) 139
+1 Skyshroud Claim (PLST) NEM-117
+1 Sol Ring (LCC) 313
+1 Solemn Simulacrum (MKC) 238
+1 Spellgyre (BLB) 72
+1 Spore Frog (MH1) 180
+2 Swamp (THS) 241
+1 Swiftfoot Boots (M12) 219
+1 The Gitrog Monster (SOI) 245
+1 Three Visits (CMR) 261
+1 Tranquil Thicket (DSC) 318
+1 Troll of Khazad-dûm (LTR) 111
+1 Turn to Frog (ORI) 81
+1 Twenty-Toed Toad (BLC) 51
+1 Undercity Sewers (MKM) 270
+1 Underground Mortuary (MKM) 271
+1 Undergrowth Stadium (CMR) 359
+1 Urza's Cave (MH3) 234
+1 Utopia Sprawl (WOT) 63
+1 Valley Mightcaller (BLB) 202
+1 Vanquisher's Banner (LCC) 316
+1 Verdant Catacombs (MM3) 249
+1 Watery Grave (GTC) 249
+1 Wild Growth (3ED) 230
+1 Wonder (C13) 67
+1 Yargle and Multani (MOM) 317
+1 Zagoth Triome (IKO) 259

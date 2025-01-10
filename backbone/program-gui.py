@@ -313,7 +313,7 @@ class MagicGUI(QWidget):
                 return super().eventFilter(obj, event)
         if event.type() == QtCore.QEvent.KeyPress and self.page_name == "deck":
             if event.key() == QtCore.Qt.Key_Return and self.file_box.hasFocus():
-                
+                self.use_listfinder("file")
                 return super().eventFilter(obj, event)
         return super().eventFilter(obj, event)
     
@@ -334,7 +334,10 @@ class MagicGUI(QWidget):
             data = self.file_box.text()
             
         out = self.deck_finder.get_output(method, data)
-        self.output_box.setPlainText(out)
+        if out == "IOError" or out == "FileNotFoundError":
+            InfoWindow.show_popup(self, "File Result", out)
+        else:
+            self.output_box.setPlainText(out)
     
 
     #Changing the layout to the deck page

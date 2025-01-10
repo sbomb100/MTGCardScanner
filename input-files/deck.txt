@@ -1,96 +1,37 @@
-The Beamtown Bullies (NCC) 101
-Abrupt Decay (PLST) GK1-57
-Ancient Tomb (UMA) 236
-Anvil of Bogardan (VIS) 141
-Arcane Signet (CLB) 298
-Arid Mesa (MH2) 244
-Assassin's Trophy (GRN) 152
-Badlands (3ED) 282
-Bayou (3ED) 283
-Beast Within (CLB) 820
-Birds of Paradise (M10) 168
-Blood Crypt (RNA) 245
-Bloodstained Mire (KTK) 230
-Bloom Tender (PLST) EVE-66
-Boseiju, Who Endures (NEO) 266
-Buried Alive (UMA) 88
-Chaos Warp (PLST) C20-146
-Chrome Mox (2XM) 240
-City of Brass (7ED) 327
-Command Tower (C21) 284
-Dauthi Voidwalker (MH2) 81
-Deflecting Swat (C20) 50
-Delighted Halfling (LTR) 158
-Demonic Tutor (SUM) 105
-Entomb (UMA) 94
-Exotic Orchard (CLB) 893
-Force of Vigor (PLST) MH1-164
-Gamble (UMA) 132
-Gemstone Caverns (PLST) TSP-274
-Gemstone Mine (WTH) 164
-Green Sun's Zenith (MBS) 81
-Heroic Intervention (AER) 109
-Ignoble Hierarch (MH2) 166
-Imperial Seal (2X2) 79
-Lion's Eye Diamond (MIR) 307
-Lotus Petal (PLST) TMP-294
-Mana Confluence (JOU) 163
-Marsh Flats (MH2) 248
-Misty Rainforest (MH2) 250
-Mox Diamond (STH) 138
-Mox Opal (2XM) 275
-Nature's Claim (CNS) 171
-Noxious Revival (PLST) NPH-118
-Opposition Agent (CMR) 141
-Orcish Bowmasters (LTR) 103
-Overgrown Tomb (GRN) 253
-Peer into the Abyss (M21) 117
-Polluted Delta (KTK) 239
-Praetor's Grasp (NPH) 71
-Ragavan, Nimble Pilferer (MH2) 138
-Reanimate (CC2) 5
-Reflecting Pool (CLB) 358
-Scalding Tarn (MH2) 254
-Seedborn Muse (10E) 296
-Sensei's Divining Top (PLST) EMA-232
-Sol Ring (CLB) 871
-Steely Resolve (ONS) 286
-Stomping Ground (RNA) 259
-Survival of the Fittest (EXO) 129
-Sylvan Library (CC1) 5
-Taiga (3ED) 287
-Tainted Pact (STA) 33
-Toxic Deluge (CC2) 6
-Urza's Saga (MH2) 259
-Vampiric Tutor (PLST) EMA-112
-Veil of Summer (M20) 198
-Verdant Catacombs (MH2) 260
-Wheel of Fortune (3ED) 185
-Wooded Foothills (KTK) 249
-Worldly Tutor (DMR) 353
-Aspect of Mongoose (TSP) 191
-Bronze Bombshell (DIS) 160
-Cast Down (CLB) 119
-Cathartic Reunion (IKO) 110
-Delighted Halfling (LTR) 158
-Emergence Zone (WAR) 245
-Faithless Looting (C21) 168
-Fellwar Stone (CLB) 860
-Infernal Grasp (MID) 107
-Jarad's Orders (RTR) 175
-Leveler (TSR) 397
-Lightning Bolt (2X2) 361
-Magewright's Stone (DIS) 162
-Marvin, Murderous Mimic (PDSK) 253p
-Mountain (NEO) 299
-Pyroblast (5ED) 262
-Red Elemental Blast (3ED) 171
-Riftsweeper (MMA) 159
-Rummaging Goblin (XLN) 160
-Seeker of Skybreak (TMP) 254
-Snow-Covered Forest (KHM) 285
-Snow-Covered Mountain (KHM) 283
-Snow-Covered Swamp (KHM) 280
-Thornbite Staff (MOR) 145
-Thrill of Possibility (ELD) 146
-Tibalt's Trickery (PKHM) 153p
+1 Cavern of Souls
+4 Chord of Calling
+2 Dryad Arbor
+1 Dwynen's Elite
+2 Eladamri, Korvecdal
+1 Elvish Mystic
+1 Elvish Visionary
+3 Elvish Warmaster
+1 Ezuri, Renegade Leader
+3 Forest
+4 Green Sun's Zenith
+4 Heritage Druid
+4 Leaf-Crowned Visionary
+2 Llanowar Elves
+2 Misty Rainforest
+2 Nettle Sentinel
+2 Overgrown Tomb
+4 Priest of Titania
+4 Quirion Ranger
+2 Shaman of the Pack
+1 Underground Mortuary
+2 Verdant Catacombs
+2 Windswept Heath
+4 Wirewood Symbiote
+1 Wooded Foothills
+1 Yavimaya, Cradle of Growth
+
+SIDEBOARD:
+1 Collector Ouphe
+2 Endurance
+2 Fatal Push
+2 Force of Vigor
+1 Reclamation Sage
+1 Soulless Jailer
+2 Sylvan Anthem
+3 Thoughtseize
+1 Veil of Summer

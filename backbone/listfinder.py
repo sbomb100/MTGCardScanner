@@ -1,6 +1,7 @@
 
 import os
 import re
+
 #how expensive does a card have to be to warrant a proxy
 #somewher ebetween 1 - 2 USD
 
@@ -15,6 +16,7 @@ class DeckFinder:
         self.cheap_needed_cards = []
         self.proxy_needed_cards = []
         self.unable_to_buy = []
+        self.not_found = []
         self.proxy_limit = money_limit
 
     
@@ -29,7 +31,7 @@ class DeckFinder:
         return filename
 
 
-    def ensure_txt_extension(filename):
+    def ensure_txt_extension(self, filename):
         if os.path.splitext(filename)[1] == "":
             return f"{filename}.txt"
         elif not filename.endswith(".txt"):
@@ -90,38 +92,41 @@ class DeckFinder:
                             else:
                                 self.proxy_needed_cards.append((line, result, number))
                     else:
-                        print("error- card not found on scryfall")
+                        self.not_found.append(name)
                         
     def get_output(self, method, data):
         if (method == "file"):
-            filename = self.ensure_txt_extension(data) 
-
-            with open(filename, 'r') as file:
-                #get commander name:
-                commander_name = file.readline().split(" (")
-                pattern = r"^(\d+)\s+(.+)$"
-                match = re.match(pattern, commander_name)
-                if match:
-                    commander_name = match.group(2) 
-
-                if (commander_name == ""):
-                    self.out_filename = self.get_unique_filename()
-                else:
-                    self.out_filename = f"{commander_name.replace(" ", "_").lower()}.txt"
-
-                #write whole deck into 2 lists of owned and unowned for better writing into file
-                file.seek(0)
-                for line in file:
+            try:
+                filename = self.ensure_txt_extension(data)
+                with open(filename, 'r') as file:
+                    #get commander name:
+                    commander_name = file.readline().split(" (")[0]
                     pattern = r"^(\d+)\s+(.+)$"
-                    match = re.match(pattern, line.split(" (")[0])
+                    match = re.match(pattern, commander_name)
                     if match:
-                        number = match.group(1)  # The number
-                        name = match.group(2)  # The name of the card
+                        commander_name = match.group(2) 
 
-                    self.sort_cards(line, name, number)
+                    if (commander_name == ""):
+                        self.out_filename = self.get_unique_filename()
+                    else:
+                        self.out_filename = f"{commander_name.replace(" ", "_").lower()}.txt"
 
-                self.format_output()
-                
+                    #write whole deck into 2 lists of owned and unowned for better writing into file
+                    file.seek(0)
+                    for line in file:
+                        pattern = r"^(\d+)\s+(.+)$"
+                        match = re.match(pattern, line.split(" (")[0])
+                        if match:
+                            number = match.group(1)  # The number
+                            name = match.group(2)  # The name of the card
+
+                        self.sort_cards(line, name, number)
+
+                    return self.format_output()
+            except FileNotFoundError:
+                return ("FileNotFoundError") #doesnt exist
+            except IOError:
+                return ("IOError") #cant open
 
                         
         #read through command line
@@ -177,6 +182,13 @@ class DeckFinder:
             self.output = self.output + (updated_line)
             if not self.output.endswith("\n"):
                 self.output = self.output + ("\n")
+        if len(self.not_found) > 0:
+            self.output = self.output + ("\nCARDS COULDNT BE FOUND ON SCRYFALL-----------------\n")
+            for item in self.not_found:
+                self.output = self.output + (item)
+                if not self.output.endswith("\n"):
+                    self.output = self.output + ("\n")
+
 
         return self.output
 

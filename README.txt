@@ -19,7 +19,7 @@ Possible add-ons:
 
 #NEXT STEPS 
 #- Possibly multithread image processing for card titles to make it so it can read a card thats upside down or right side up
-
+#- Does not accept chars àâäéèêëîïôöùûüÿçñÁÉÖ
 #- perhaps shift into website or mobile app to make it easier to use
 #  > i dont know ios development
 #  > i do not have an android
