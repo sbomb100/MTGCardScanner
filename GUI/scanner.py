@@ -37,7 +37,6 @@ class CardScanner:
         
         return None
 
-    #initial bug: points will show up in contour array out of order. order them
     def order_points(self, pts):
         rect = np.zeros((4, 2), dtype="float32")
         s = pts.sum(axis=1)
@@ -89,16 +88,16 @@ class CardScanner:
         roi_h = int(0.06 * img.shape[0])  
 
         card_name_roi = img[roi_y:roi_y + roi_h, roi_x:roi_x + roi_w]
-        cv2.imshow("name", card_name_roi)
+        #DEBUG: cv2.imshow("name", card_name_roi)
         gray = cv2.cvtColor(card_name_roi, cv2.COLOR_BGR2GRAY)
         # Apply thresholding
         _, binary = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
   
     
-        cv2.imshow("name", binary)
+        #DEBUG: cv2.imshow("name", binary)
   
         card_name = [
-            re.sub('[^a-zA-Z,+\', ]', '', pytesseract.image_to_string(binary)).strip() 
+            re.sub('[^-a-zA-Z,+\', ]', '', pytesseract.image_to_string(binary)).strip() 
             for _ in range(5)]
         name_counts = Counter(card_name)
         most_common_name, count = name_counts.most_common(1)[0]
@@ -167,10 +166,9 @@ class CardScanner:
             return -1
 
         
-    def __init__(self, camera_index=0):
+    def __init__(self):
         self.threshold1 = 50
         self.threshold2 = 150
-        self.cap = cv2.VideoCapture(camera_index)
         self.all_cards = sqlite3.connect("databases/scryfall.db")
         self.my_cards = sqlite3.connect("databases/MTGPersonalCollection.db")
         self.last_card = ""
@@ -199,7 +197,7 @@ class CardScanner:
                 card_data = self.extract_card(wrapped_card)
                 
             
-                cv2.imshow("Warped", wrapped_card)
+                #DEBUG: cv2.imshow("Warped", wrapped_card)
                 #print(f"{card_data} is {last_card} \n")
                 if card_data.strip() == "":
                     #print("DEBUG: Card data is empty, skipping frame.")
@@ -220,11 +218,19 @@ class CardScanner:
                     
             
     def shutdown(self):
-        self.cap.release()
+        if  self.camera:
+            self.cap.release()
+
         self.all_cards.close()
         self.my_cards.close()
         cv2.destroyAllWindows()
 
+    def turn_on(self, camera_index=1):
+        self.cap = cv2.VideoCapture(camera_index)
+        self.camera = True
+    def turn_off(self):
+        self.cap.release()
+        self.camera = False
 
 #TODO:
 #make so any orientation will get flipped upright.
