@@ -6,6 +6,7 @@ import sys
 import os
 import cv2
 from scanner import CardScanner
+from listfinder import DeckFinder
 import numpy as np
 import requests
 from functools import partial
@@ -33,7 +34,7 @@ class MagicGUI(QWidget):
         self.list_oldscans = "No Previous Scans"
         self.last_card_pixels = None
         self.page_name = "home"
-
+        self.money_limit = 1.25
 
 
     
@@ -186,8 +187,6 @@ class MagicGUI(QWidget):
             self.scanner_running = True
             self.toggle_button.setText("Stop Scanner")
             
-
-
     def closeEvent(self, event):
         #Release resources on window close.
         if self.scanner_running:
@@ -239,7 +238,7 @@ class MagicGUI(QWidget):
         InfoWindow.show_popup(self, "Previous Scans", self.list_oldscans)
             
     #Changing the layout to the scanner page
-
+    
     def draw_scannerpage(self):
         self.page_name = "scanner"
         self.setup_scanner()
@@ -308,15 +307,13 @@ class MagicGUI(QWidget):
 
 
     def eventFilter(self, obj, event):
-        
         if event.type() == QtCore.QEvent.KeyPress and obj is self.search_bar:
             if event.key() == QtCore.Qt.Key_Return and self.search_bar.hasFocus():
                 self.search()
                 return super().eventFilter(obj, event)
         if event.type() == QtCore.QEvent.KeyPress and self.page_name == "deck":
             if event.key() == QtCore.Qt.Key_Return and self.file_box.hasFocus():
-                self.search()
-                #TODO LINK TO DECK MAKER
+                
                 return super().eventFilter(obj, event)
         return super().eventFilter(obj, event)
     
@@ -328,12 +325,23 @@ class MagicGUI(QWidget):
             CardSearchWindow.show_popup(self, card)
 
         
+    def use_listfinder(self, method):
+        self.deck_finder = DeckFinder(self.money_limit, self.db)
+        data = ""
+        if method == "paste":
+            data = self.paste_box.toPlainText()
+        if method == "file":
+            data = self.file_box.text()
+            
+        out = self.deck_finder.get_output(method, data)
+        self.output_box.setPlainText(out)
+    
 
     #Changing the layout to the deck page
     def draw_deckpage(self):
         self.page_name = "deck"
         self.clear_layout(self.layout())
-
+        
         deck_window = QVBoxLayout()
 
         deck_window.addLayout(self.draw_header(1))
@@ -349,7 +357,7 @@ class MagicGUI(QWidget):
         self.paste_box.setPlaceholderText("Paste your wanted deck here...")
         paste_window.addWidget(self.paste_box)
         paste_button = QPushButton("Process Card List")
-        #self.process_button.clicked.connect(self.process_cards)
+        paste_button.clicked.connect(partial(self.use_listfinder, "paste"))
         paste_window.addWidget(paste_button)
         left_side.addLayout(paste_window)
 
@@ -371,7 +379,7 @@ class MagicGUI(QWidget):
         #Right Side Vertical Box
         right_side = QVBoxLayout()
         self.output_box =  QTextEdit()
-        self.output_box.setPlaceholderText("Deck Output Here...")
+        #self.output_box.setPlaceholderText("Deck Output Here...")
         right_side.addWidget(self.output_box)
         outputDL_button = QPushButton("Download Deck as Text File")
         #self.outputDL_button.clicked.connect(self.download_deck_output)
