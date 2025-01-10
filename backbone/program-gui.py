@@ -9,6 +9,7 @@ from scanner import CardScanner
 import numpy as np
 import requests
 from functools import partial
+from carddb import CardDatabases
 
 class MagicGUI(QWidget):
     
@@ -26,11 +27,13 @@ class MagicGUI(QWidget):
     def __init__(self):
         super().__init__()
         self.init_ui()
-
+        self.db = CardDatabases()
         #scanner initial state to save information
         self.scanner_running = False
         self.list_oldscans = "No Previous Scans"
         self.last_card_pixels = None
+        self.page_name = "home"
+
 
 
     
@@ -45,6 +48,7 @@ class MagicGUI(QWidget):
         self.clear_layout(self.layout())
 
         main_window = QVBoxLayout()
+        self.page_name = "home"
 
         #Title Text
         title = QLabel('Magic the Gathering Personal Database')
@@ -109,11 +113,10 @@ class MagicGUI(QWidget):
     #SCANNER METHODS
     def setup_scanner(self):
         # Initialize the scanner
-        self.scanner = CardScanner()
+        self.scanner = CardScanner(self.db)
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_frame)
         self.scanner_running = False
-        self.scanner_open = True
         self.last_card = ""
 
     def update_frame(self):
@@ -146,16 +149,16 @@ class MagicGUI(QWidget):
                 result = self.scanner.analyze_card(frame)
                 
                 if result != "" and result != self.last_card:
-                    self.result_label.setText(result[1])
+                    self.result_label.setText((result[1] + f": nonfoil: {result[8]}, foil: {result[9]}"))
                     self.last_card = result
 
                     index = self.list_oldscans.find("\n")
                     if index != -1 and len(self.list_oldscans.splitlines()) >= 15:
-                        self.list_oldscans = self.list_oldscans[index+1:] + result[1] + "\n"
+                        self.list_oldscans = self.list_oldscans[index+1:] + (result[1] + f": nonfoil: {result[8]}, foil: {result[9]}") + "\n"
                     elif index != -1:
-                        self.list_oldscans = self.list_oldscans + result[1] + "\n"
+                        self.list_oldscans = self.list_oldscans + (result[1] + f": nonfoil: {result[8]}, foil: {result[9]}") + "\n"
                     else:
-                        self.list_oldscans = result[1] + "\n"
+                        self.list_oldscans = (result[1] + f": nonfoil: {result[8]}, foil: {result[9]}") + "\n"
                     
                     
                     response = requests.get(result[7])
@@ -188,14 +191,14 @@ class MagicGUI(QWidget):
     def closeEvent(self, event):
         #Release resources on window close.
         if self.scanner_running:
-            self.scanner_open = False
             self.timer.stop()
             self.scanner.shutdown()
+            
+        self.db.close_db()
         super().closeEvent(event)
         
     def change_page(self, index):
-        if self.scanner_open == True:
-            self.scanner_open = False
+        if self.page_name == "scanner":
             self.close_scanner()
             self.timer.stop()
         if index == -1:
@@ -221,9 +224,10 @@ class MagicGUI(QWidget):
         dropdown.currentIndexChanged.connect(self.change_page)
         header_box.addWidget(dropdown)
 
-        search_bar = QLineEdit()
-        search_bar.setPlaceholderText("Search...")
-        header_box.addWidget(search_bar)
+        self.search_bar = QLineEdit()
+        self.search_bar.setPlaceholderText("Search...")
+        self.search_bar.installEventFilter(self)
+        header_box.addWidget(self.search_bar)
 
         search_button = QPushButton("Search")
         #search_button.clicked.connect(self.perform_search)
@@ -236,8 +240,8 @@ class MagicGUI(QWidget):
             
     #Changing the layout to the scanner page
     def draw_scannerpage(self):
+        self.page_name = "scanner"
         self.setup_scanner()
-        self.scanner_open = True
         self.clear_layout(self.layout())
         main_scanner_window = QVBoxLayout()
         
@@ -303,15 +307,25 @@ class MagicGUI(QWidget):
 
 
     def eventFilter(self, obj, event):
-        if event.type() == QtCore.QEvent.KeyPress and obj is self.file_box:
-            if event.key() == QtCore.Qt.Key_Return and self.file_box.hasFocus():
-                print(self.file_box.text())
+        
+        if event.type() == QtCore.QEvent.KeyPress and obj is self.search_bar:
+            if event.key() == QtCore.Qt.Key_Return and self.search_bar.hasFocus():
+                print(self.search_bar.text())
                 #TODO LINK TO DECK MAKER
+                return super().eventFilter(obj, event)
+        if event.type() == QtCore.QEvent.KeyPress and self.page_name == "deck":
+            if event.key() == QtCore.Qt.Key_Return and self.file_box.hasFocus():
+                self.search(self.file_box.text())
+                #TODO LINK TO DECK MAKER
+                return super().eventFilter(obj, event)
         return super().eventFilter(obj, event)
     
+    #def search(self, card_name):
+    #    self.
+
     #Changing the layout to the deck page
     def draw_deckpage(self):
-        self.scanner_open = False
+        self.page_name = "deck"
         self.clear_layout(self.layout())
 
         deck_window = QVBoxLayout()

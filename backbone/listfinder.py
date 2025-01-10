@@ -1,19 +1,15 @@
-import sqlite3
-import os
-import sys
 
+import os
 #how expensive does a card have to be to warrant a proxy
 #somewher ebetween 1 - 2 USD
 
 
 #CONSIDER changing output in file to be easier to paste into proxy websites
 class DeckFinder:
-    def __init__(self, money_limit):
-        self.connection = sqlite3.connect("./databases/MTGPersonalCollection.db")
-        self.cursor = self.connection.cursor()
-        self.db = sqlite3.connect("./databases/cards.db")
-        self.cards_cursor = self.db.cursor()
-        self.out_filename = "filler"
+    def __init__(self, money_limit, db):
+        self.cursor = db.my_cursor()
+        self.cards_cursor = db.cards_cursor()
+        self.out_filename = "output"
         self.owned_cards = []
         self.cheap_needed_cards = []
         self.proxy_needed_cards = []
@@ -40,7 +36,11 @@ class DeckFinder:
         return filename
 
     #read text file
-    
+    def search_name(self, name):
+        self.cards_cursor.execute("""SELECT id, name, set_name, type, rarity, mana_cost, oracle_text, card_img
+                        FROM cards WHERE name = ?""", (name,))
+        return self.cards_cursor.fetchone()
+            
 
     def sort_cards(self, line, name):
                 self.cursor.execute("SELECT id, name, count FROM cards WHERE name = ?", (name,))
@@ -69,10 +69,9 @@ class DeckFinder:
                     else:
                         print("error- card not found on scryfall")
                         
-    def get_output(self, method):
+    def get_output(self, method, data):
         if (method == "text"):
-            print("\nReading Text File -----")
-            filename = self.ensure_txt_extension(input("Type Text File Name\n")) 
+            filename = self.ensure_txt_extension(data) 
 
             with open(filename, 'r') as file:
                 #get commander name:
@@ -90,24 +89,24 @@ class DeckFinder:
 
         #read through command line
         elif (method == "paste"):
-            print("\nPaste List:")
-            list = sys.stdin.read()
-            lines = list.strip().split("\n")
+            lines = data.strip().split("\n")
             commander_name = lines[0].split(" (")[0]
             if (commander_name == ""):
-                out_filename = self.get_unique_filename()
+                self.out_filename = self.get_unique_filename()
             else:
-                out_filename = f"{commander_name.replace(" ", "_").lower()}.txt"
+               self.out_filename = f"{commander_name.replace(" ", "_").lower()}.txt"
 
+            output = ""
             for line in lines:
-                print(line.split(" (")[0])
+                output = output + (line.split(" (")[0])
                 self.sort_cards(line, line.split(" (")[0])
 
         else: 
-            print("invalid input")
+            self.output = ("invalid input")
 
+    def write_output_to_file(self):
         #write to file
-        with open(out_filename, 'w') as outfile:
+        with open(self.out_filename, 'w') as outfile:
             outfile.write("OWNED CARDS -----------------\n")
             for item in self.owned_cards:
                 outfile.write(f"You have {item[2]} of {item[1]}\n")
@@ -131,6 +130,4 @@ class DeckFinder:
                     outfile.write("\n")
 
 
-    def close_db(self):
-        self.connection.close()
-        self.db.close()
+    

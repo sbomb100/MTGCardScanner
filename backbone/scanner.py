@@ -6,7 +6,6 @@ import numpy as np
 import pytesseract
 from collections import Counter
 import re
-import sqlite3
 
 class CardScanner:
     
@@ -138,7 +137,7 @@ class CardScanner:
                     WHERE id = ?
                     """, (new_count, card[0]))
                     self.my_cards.commit()
-                    return card
+                    return (*card[:8], price[1], price[2])
                 else:
                     # If the card does not exist, insert a new card with count
                     print("new card!\n")
@@ -158,7 +157,7 @@ class CardScanner:
                     ))
                     print(f"Card Added -- {card[1]}")
                     self.my_cards.commit()
-                    return card
+                    return (*card[:8], price[1], price[2])
             else:
                 print(f"Price not found")
                 return -1
@@ -166,14 +165,13 @@ class CardScanner:
             return -1
 
         
-    def __init__(self):
+    def __init__(self, db):
         self.threshold1 = 50
         self.threshold2 = 150
-        self.all_cards = sqlite3.connect("databases/scryfall.db")
-        self.my_cards = sqlite3.connect("databases/MTGPersonalCollection.db")
         self.last_card = ""
-        self.all_cursor = self.all_cards.cursor()
-        self.my_cursor = self.my_cards.cursor()
+        self.all_cursor = db.cards_cursor
+        self.my_cursor = db.my_cursor
+        self.my_cards = db.my_cards
 
         
 
