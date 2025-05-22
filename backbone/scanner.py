@@ -88,16 +88,23 @@ class CardScanner:
 
         card_name_roi = img[roi_y:roi_y + roi_h, roi_x:roi_x + roi_w]
         #DEBUG: cv2.imshow("name", card_name_roi)
-        gray = cv2.cvtColor(card_name_roi, cv2.COLOR_BGR2GRAY)
+        # gray = cv2.cvtColor(card_name_roi, cv2.COLOR_BGR2GRAY)
         # Apply thresholding
-        _, binary = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-  
+        # _, binary = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        gray = cv2.cvtColor(card_name_roi, cv2.COLOR_BGR2GRAY)
+        binary = cv2.adaptiveThreshold(gray, 255, 
+                                    cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
+                                    cv2.THRESH_BINARY, 11, 2)
+        kernel = np.ones((1, 1), np.uint8)
+        binary = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, kernel)
     
         #DEBUG: cv2.imshow("name", binary)
   
         card_name = [
             re.sub('[^-a-zA-Z,+\', ]', '', pytesseract.image_to_string(binary)).strip() 
             for _ in range(5)]
+        # custom_config = r'--oem 3 --psm 7 -c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz\',\- '
+        # card_name = pytesseract.image_to_string(binary, config=custom_config)
         name_counts = Counter(card_name)
         most_common_name, count = name_counts.most_common(1)[0]
         if count > 2:  # at least 3 out of 5 scans agree
@@ -223,7 +230,7 @@ class CardScanner:
         self.my_cards.close()
         cv2.destroyAllWindows()
 
-    def turn_on(self, camera_index=1):
+    def turn_on(self, camera_index=0):
         self.cap = cv2.VideoCapture(camera_index)
         self.camera = True
     def turn_off(self):
